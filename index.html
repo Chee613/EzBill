@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EzBill | AI Autofill & Compliance</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e', // Base Green
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                            950: '#052e16',
+                        },
+                        bill: {
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                        },
+                        dark: {
+                            bg: '#020617', 
+                            surface: '#0f172a',
+                            border: '#1e293b'
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* CSS Variables for Theming */
+        :root {
+            --bg-color: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: #dcfce7; 
+            --text-primary: #0f172a; 
+            --text-secondary: #334155; 
+            --accent-primary: #16a34a; 
+            --accent-hover: #15803d; 
+            --input-bg: #f8fafc;
+            --input-border: #cbd5e1;
+            --shadow-color: rgba(22, 163, 74, 0.15);
+        }
+
+        .dark {
+            --bg-color: #020617; 
+            --glass-bg: rgba(15, 23, 42, 0.7);
+            --glass-border: rgba(34, 197, 94, 0.2); 
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --accent-primary: #4ade80; 
+            --accent-hover: #22c55e; 
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --input-border: rgba(34, 197, 94, 0.3);
+            --shadow-color: rgba(34, 197, 94, 0.25);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+
+        .custom-input {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-primary);
+            font-family: 'Fira Code', monospace;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .custom-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--shadow-color);
+            outline: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+            color: #fff; 
+            border: none;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+        .dark .btn-primary {
+            color: #020617; 
+            background: var(--accent-primary);
+            box-shadow: 0 0 15px var(--shadow-color);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            box-shadow: 0 6px 16px var(--shadow-color);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            filter: grayscale(0.8);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--input-border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+
+        /* Action Button High Contrast Overrides */
+        .action-button {
+            background: #0f172a; 
+            color: #ffffff; 
+            border: none;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+        .action-button:hover { 
+            background: #1e293b; 
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .dark .action-button { 
+            background: linear-gradient(135deg, #9333ea, #06b6d4); 
+            color: #ffffff; 
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
+        }
+        .dark .action-button:hover { 
+            filter: brightness(1.2);
+            box-shadow: 0 0 30px rgba(147, 51, 234, 0.5); 
+            transform: translateY(-2px);
+        }
+        .action-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+            filter: grayscale(1);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- COMPONENTS ---
+
+        // Wrapper to fix React/Lucide DOM issues
+        const Icon = ({ name, className }) => {
+            const ref = useRef(null);
+            
+            useEffect(() => {
+                if (window.lucide && ref.current) {
+                    const el = document.createElement('i');
+                    el.setAttribute('data-lucide', name);
+                    if (className) el.setAttribute('class', className);
+                    ref.current.replaceChildren(el);
+                    window.lucide.createIcons({ root: ref.current });
+                }
+            }, [name, className]);
+
+            return <span ref={ref} style={{ display: 'contents' }}></span>;
+        };
+
+        const AnimatedCounter = ({ value }) => {
+            const [displayValue, setDisplayValue] = useState(0);
+            useEffect(() => {
+                let start = 0; const end = parseFloat(value || 0); if (start === end) return;
+                let timer = setInterval(() => {
+                    start += (end - start) / 8;
+                    if (Math.abs(start - end) < 0.01) { setDisplayValue(end); clearInterval(timer); } 
+                    else { setDisplayValue(start); }
+                }, 20);
+                return () => clearInterval(timer);
+            }, [value]);
+            return <span className="font-mono tracking-tight">{displayValue.toFixed(2)}</span>;
+        };
+
+        // --- TRANSLATIONS ---
+        const t = {
+            en: {
+                subtitle: "LHDN Compliance Unit",
+                settings: "Protocol Settings",
+                extension: "Extension",
+                uploadTitle: "Upload Receipt",
+                uploadDesc: "JPG, PNG, or PDF",
+                initiateScan: "INITIATE SCAN",
+                dropReceipt: "Drop receipt image or PDF",
+                logsTitle: "System Operations",
+                logsReady: "System ready. Waiting for input...",
+                btnUpload: "SECURE UPLOAD...",
+                btnProcess: "PROCESSING...",
+                btnAction: "PROCESS INVOICE",
+                resultsTitle: "Extracted Data",
+                compliant: "VALID",
+                invalid: "INVALID",
+                noData: "NO DATA",
+                supplierInfo: "Supplier Information",
+                buyerInfo: "Buyer Information",
+                entityName: "Entity Name",
+                tin: "TIN (Tax ID)",
+                regId: "Registration ID",
+                email: "Contact Email",
+                address: "Address",
+                ragTitle: "Neural Classification (RAG)",
+                msicCode: "MSIC Code",
+                matched: "Matched:",
+                lineItems: "Line Items",
+                desc: "Description",
+                qty: "Qty",
+                price: "Price",
+                total: "Total Payable",
+                copyJson: "COPY JSON",
+                submit: "SUBMIT TO MyInvois API",
+                configTitle: "System Config",
+                cancel: "Cancel",
+                connect: "Connect",
+                demoMode: "⚠️ Running in DEMO MODE (No API Key).",
+                demoComplete: "Demo Analysis Complete.",
+                fileEncrypted: "File encrypted & uploaded.",
+                neuralEngine: "Engaging JamAI Neural Engine...",
+                neuralComplete: "Neural analysis complete.",
+                compliancePassed: "Compliance Validation: PASSED.",
+                jsonCopied: "JSON Copied!",
+                transmitting: "Transmitting to MyInvois Gateway...",
+                transmitSuccess: "Transmission Successful (Sandbox).",
+                submitted: "Submitted to LHDN!",
+                validatingTax: "➜ Validating Tax Codes...",
+                chatTitle: "EzBill Assistant",
+                chatPlaceholder: "Ask about e-Invoice compliance...",
+                chatSend: "Send",
+                chatWelcome: "Hi! I am EzBill. Ask me about e-Invoicing in English or Bahasa Melayu!",
+                chatTyping: "Typing..."
+            },
+            bm: {
+                subtitle: "Unit Pematuhan LHDN",
+                settings: "Tetapan Protokol",
+                extension: "Ekstensi",
+                uploadTitle: "Muat Naik Resit",
+                uploadDesc: "JPG, PNG, atau PDF",
+                initiateScan: "MULAKAN IMBASAN",
+                dropReceipt: "Letak gambar resit atau PDF",
+                logsTitle: "Operasi Sistem",
+                logsReady: "Sistem sedia. Menunggu input...",
+                btnUpload: "MUAT NAIK SELAMAT...",
+                btnProcess: "MEMPROSES...",
+                btnAction: "PROSES INVOIS",
+                resultsTitle: "Data Diekstrak",
+                compliant: "SAH",
+                invalid: "TIDAK SAH",
+                noData: "TIADA DATA",
+                supplierInfo: "Maklumat Pembekal",
+                buyerInfo: "Maklumat Pembeli",
+                entityName: "Nama Entiti",
+                tin: "TIN (No. Cukai)",
+                regId: "ID Pendaftaran",
+                email: "Emel",
+                address: "Alamat",
+                ragTitle: "Klasifikasi Neural (RAG)",
+                msicCode: "Kod MSIC",
+                matched: "Padanan:",
+                lineItems: "Item Baris",
+                desc: "Deskripsi",
+                qty: "Ktt",
+                price: "Harga",
+                total: "Jumlah Perlu Dibayar",
+                copyJson: "SALIN JSON",
+                submit: "HANTAR KEPADA MyInvois API",
+                configTitle: "Konfigurasi Sistem",
+                cancel: "Batal",
+                connect: "Sambung",
+                demoMode: "⚠️ Mod DEMO (Tiada Kunci API).",
+                demoComplete: "Analisis Demo Selesai.",
+                fileEncrypted: "Fail disulitkan & dimuat naik.",
+                neuralEngine: "Menggunakan Enjin Neural JamAI...",
+                neuralComplete: "Analisis neural selesai.",
+                compliancePassed: "Pengesahan Pematuhan: LULUS.",
+                jsonCopied: "JSON Disalin!",
+                transmitting: "Menghantar ke Gerbang MyInvois...",
+                transmitSuccess: "Penghantaran Berjaya (Sandbox).",
+                submitted: "Dihantar ke LHDN!",
+                validatingTax: "➜ Mengesahkan Kod Cukai...",
+                chatTitle: "Pembantu EzBill",
+                chatPlaceholder: "Tanya pasal pematuhan e-Invois...",
+                chatSend: "Hantar",
+                chatWelcome: "Hai! Saya EzBill. Tanya saya tentang e-Invois dalam Bahasa Inggeris atau Bahasa Melayu!",
+                chatTyping: "Sedang menaip..."
+            }
+        };
+
+        const TopControls = ({ isDark, toggleTheme, lang, toggleLang }) => (
+            <div className="flex items-center gap-2">
+                <button onClick={toggleLang} className="px-2 py-1 text-xs font-bold rounded border border-slate-300 dark:border-white/20 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 transition font-mono">
+                    {lang === 'en' ? 'EN' : 'BM'}
+                </button>
+                <button onClick={toggleTheme} className="p-2 rounded-full transition-all duration-300 hover:bg-brand-100 dark:hover:bg-white/10 border border-transparent dark:border-white/10 group">
+                    {isDark ? <Icon name="sun" className="w-5 h-5 text-yellow-300" /> : <Icon name="moon" className="w-5 h-5 text-slate-600" />}
+                </button>
+            </div>
+        );
+
+        const ConfigModal = ({ isOpen, onClose, config, onSave, lang }) => {
+            if (!isOpen) return null;
+            const [temp, setTemp] = useState(config);
+            const txt = t[lang];
+
+            return (
+                <div className="fixed inset-0 bg-black/40 dark:bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm transition-opacity">
+                    <div className="glass-panel p-8 rounded-2xl w-full max-w-md relative overflow-hidden animate-float">
+                        <div className="absolute -top-20 -right-20 w-40 h-40 bg-brand-400 rounded-full filter blur-3xl opacity-20"></div>
+                        <div className="flex justify-between items-center mb-6 relative z-10">
+                            <h3 className="text-xl font-bold text-brand-700 dark:text-brand-400 flex items-center gap-2"><Icon name="sliders" className="w-5 h-5" /> {txt.configTitle}</h3>
+                            <button onClick={onClose} className="text-slate-400 hover:text-brand-600 transition"><Icon name="x" /></button>
+                        </div>
+                        <div className="space-y-5 relative z-10">
+                            <InputGroup label="JamAI Project ID" value={temp.projectId} onChange={(e) => setTemp({...temp, projectId: e.target.value})} placeholder="proj_..." isConfig={true} />
+                            <InputGroup label="Personal Access Token" value={temp.apiKey} onChange={(e) => setTemp({...temp, apiKey: e.target.value})} placeholder="jamai_pat_..." type="password" isConfig={true} />
+                            <InputGroup label="Action Table ID (OCR)" value={temp.tableId} onChange={(e) => setTemp({...temp, tableId: e.target.value})} placeholder="Action Table ID" isConfig={true} />
+                            <InputGroup label="Chat Table ID (EzBill_Chat)" value={temp.chatTableId} onChange={(e) => setTemp({...temp, chatTableId: e.target.value})} placeholder="EzBill_Chat" isConfig={true} />
+                        </div>
+                        <div className="mt-8 flex justify-end gap-3 relative z-10">
+                            <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition">{txt.cancel}</button>
+                            <button onClick={() => { onSave(temp); onClose(); }} className="btn-primary px-6 py-2 rounded-lg text-sm shadow-lg">{txt.connect}</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ChatWidget = ({ config, lang }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            const [messages, setMessages] = useState([]);
+            const [input, setInput] = useState("");
+            const [loading, setLoading] = useState(false);
+            const txt = t[lang];
+            const messagesEndRef = useRef(null);
+
+            useEffect(() => {
+                if (messages.length === 0) {
+                    setMessages([{ role: 'ai', text: txt.chatWelcome }]);
+                } else if (messages[0].role === 'ai') {
+                    const newMsgs = [...messages];
+                    newMsgs[0].text = txt.chatWelcome;
+                    setMessages(newMsgs);
+                }
+            }, [lang]);
+
+            useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+
+            const handleSend = async () => {
+                if (!input.trim()) return;
+                const userMsg = input;
+                
+                setInput("");
+                setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+                setLoading(true);
+
+                try {
+                    if (!config.apiKey || !config.projectId || !config.chatTableId) {
+                        throw new Error("Missing Settings. Please click the Gear Icon.");
+                    }
+
+                    const response = await fetch("https://api.jamaibase.com/api/v1/gen_tables/chat/rows/add", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${config.apiKey}`,
+                            "X-PROJECT-ID": config.projectId,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            "table_id": config.chatTableId,
+                            "data": [{ "User": userMsg }], 
+                            "stream": false
+                        })
+                    });
+
+                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+
+                    const data = await response.json();
+                    
+                    let aiReply = "";
+
+                    if (data.rows && data.rows.length > 0) {
+                        const columns = data.rows[0].columns;
+                        for (const [key, colData] of Object.entries(columns)) {
+                            if (key === "ID" || key === "Updated at") continue;
+                            if (!colData) continue;
+
+                            let candidateText = "";
+                            if (colData.choices && Array.isArray(colData.choices) && colData.choices.length > 0) {
+                                const firstChoice = colData.choices[0];
+                                candidateText = firstChoice.message?.content || firstChoice.text || "";
+                            } else if (colData.text || colData.value) {
+                                candidateText = colData.text || colData.value;
+                            } else if (typeof colData === 'string') {
+                                candidateText = colData;
+                            }
+
+                            if (typeof candidateText === 'string' && candidateText.includes("chatcmpl")) {
+                                try {
+                                    const parsed = JSON.parse(candidateText);
+                                    if (parsed.choices) candidateText = parsed.choices[0].message.content;
+                                } catch (e) { /* ignore */ }
+                            }
+
+                            if (candidateText && candidateText.trim() !== userMsg.trim()) {
+                                aiReply = candidateText;
+                                break; 
+                            }
+                        }
+                    }
+
+                    if (!aiReply) {
+                        aiReply = "⚠️ Connected, but no answer text found.";
+                    } else {
+                        aiReply = aiReply
+                            .replace(/\[@\d+\]/g, "")
+                            .replace(/\*\*/g, "")
+                            .replace(/###/g, "")
+                            .replace(/"/g, "")
+                            .trim();
+                    }
+
+                    setMessages(prev => [...prev, { role: 'ai', text: aiReply }]);
+
+                } catch (err) {
+                    console.error(err);
+                    setMessages(prev => [...prev, { role: 'ai', text: "⚠️ Error: " + err.message }]);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+                    {isOpen && (
+                        <div className="mb-4 w-80 sm:w-96 h-96 bg-white dark:bg-dark-surface glass-panel rounded-2xl shadow-2xl flex flex-col animate-slide-up overflow-hidden border border-brand-200 dark:border-brand-800">
+                            <div className="bg-brand-500 dark:bg-brand-600 p-4 flex justify-between items-center text-white">
+                                <div className="flex items-center gap-2 font-bold">
+                                    <Icon name="bot" className="w-5 h-5" /> {txt.chatTitle}
+                                </div>
+                                <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 rounded p-1"><Icon name="x" className="w-4 h-4" /></button>
+                            </div>
+                            
+                            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 dark:bg-black/40">
+                                {messages.map((msg, idx) => (
+                                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                        <div className={`max-w-[80%] p-3 rounded-xl text-sm ${msg.role === 'user' ? 'bg-brand-500 text-white rounded-br-none' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-gray-200 dark:border-gray-700 rounded-bl-none shadow-sm'}`}>
+                                            {msg.text}
+                                        </div>
+                                    </div>
+                                ))}
+                                {loading && (
+                                    <div className="flex justify-start">
+                                        <div className="bg-white dark:bg-slate-800 p-3 rounded-xl rounded-bl-none border border-gray-200 dark:border-gray-700 shadow-sm">
+                                            <div className="flex gap-1">
+                                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.4s'}}></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                <div ref={messagesEndRef} />
+                            </div>
+
+                            <div className="p-3 bg-white dark:bg-dark-surface border-t border-gray-200 dark:border-gray-800">
+                                <div className="flex gap-2">
+                                    <input 
+                                        type="text" 
+                                        value={input} 
+                                        onChange={(e) => setInput(e.target.value)} 
+                                        onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                                        placeholder={txt.chatPlaceholder}
+                                        className="flex-1 p-2 text-sm border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:border-brand-500 dark:bg-slate-900 dark:text-white"
+                                    />
+                                    <button onClick={handleSend} className="p-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition disabled:opacity-50" disabled={loading}>
+                                        <Icon name="send" className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <button 
+                        onClick={() => setIsOpen(!isOpen)} 
+                        className={`p-4 rounded-full shadow-2xl transition-all transform hover:scale-110 flex items-center justify-center ${isOpen ? 'bg-gray-500 hover:bg-gray-600' : 'bg-gradient-to-r from-brand-500 to-bill-500 hover:from-brand-600 hover:to-bill-600'} text-white`}
+                    >
+                        {isOpen ? <Icon name="chevron-down" className="w-6 h-6" /> : <Icon name="message-circle" className="w-7 h-7" />}
+                    </button>
+                </div>
+            );
+        };
+
+        const InputGroup = ({ label, value, onChange, placeholder, type = "text", readOnly = false, isConfig = false, icon }) => (
+            <div className="group">
+                <label className={`block text-xs font-bold uppercase mb-1.5 tracking-wider transition-colors ${isConfig ? 'text-slate-500 dark:text-slate-400' : 'text-brand-700 dark:text-brand-300'}`}>{label}</label>
+                <div className="relative">
+                    {icon && <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">{icon}</div>}
+                    <input 
+                        type={type} 
+                        className={`custom-input w-full p-2.5 rounded-lg text-sm transition-all ${readOnly ? 'cursor-default opacity-80' : ''} ${icon ? 'pl-10' : ''}`}
+                        value={value || ''} 
+                        onChange={onChange} 
+                        placeholder={placeholder} 
+                        readOnly={readOnly}
+                    />
+                </div>
+            </div>
+        );
+
+        // --- DATA HELPERS ---
+
+        const normalizeData = (data) => {
+            // Helper to get text from UBL structure { "_": "val" } or simple value
+            const getText = (val) => {
+                if (Array.isArray(val)) {
+                    if (val[0]?.['_']) return val[0]['_'];
+                    if (typeof val[0] === 'string' || typeof val[0] === 'number') return val[0];
+                    return null;
+                }
+                return null;
+            };
+
+            // Helper to get ID from a list of PartyIdentification based on schemeID
+            const getID = (arr, scheme) => {
+                if (!Array.isArray(arr)) return null;
+                const item = arr.find(x => x.ID?.[0]?.schemeID === scheme);
+                return item ? getText(item.ID) : null;
+            };
+
+            // Helper to construct address string from UBL
+            const getUBLAddress = (party) => {
+                 const addr = party?.PostalAddress?.[0];
+                 if (!addr) return "N/A";
+                 const lines = addr.AddressLine?.map(l => getText(l.Line)).filter(Boolean).join(', ');
+                 const city = getText(addr.CityName);
+                 const zip = getText(addr.PostalZone);
+                 const state = getText(addr.CountrySubentityCode);
+                 const parts = [lines, city, zip, state].filter(Boolean);
+                 return parts.length > 0 ? parts.join(', ') : "N/A";
+            };
+
+            // 1. Check for LHDN UBL Schema
+            if (data?.Invoice?.[0]) {
+                 const inv = data.Invoice[0];
+                 const supplier = inv.AccountingSupplierParty?.[0]?.Party?.[0];
+                 const customer = inv.AccountingCustomerParty?.[0]?.Party?.[0];
+                 
+                 return {
+                     supplier: {
+                         name: getText(supplier?.PartyLegalEntity?.[0]?.RegistrationName) || "N/A",
+                         // Prioritize GST schemeID for TIN as requested, fallback to TIN
+                         tin: getID(supplier?.PartyIdentification, 'GST') || getID(supplier?.PartyIdentification, 'TIN') || "N/A",
+                         id_number: getID(supplier?.PartyIdentification, 'BRN') || "N/A",
+                         email: getText(supplier?.Contact?.[0]?.ElectronicMail) || "N/A",
+                         address: getUBLAddress(supplier)
+                     },
+                     buyer: {
+                         name: getText(customer?.PartyLegalEntity?.[0]?.RegistrationName) || "N/A",
+                         tin: getID(customer?.PartyIdentification, 'TIN') || "N/A",
+                         id_number: getID(customer?.PartyIdentification, 'BRN') || "N/A",
+                         email: getText(customer?.Contact?.[0]?.ElectronicMail) || "N/A",
+                         address: getUBLAddress(customer)
+                     },
+                     msic_code: getText(supplier?.Party?.[0]?.IndustryClassificationCode) || getText(supplier?.IndustryClassificationCode) || "N/A",
+                     buyer_activity: supplier?.IndustryClassificationCode?.[0]?.name || "General Trade",
+                     line_items: inv.InvoiceLine?.map(l => ({
+                         description: getText(l.Item?.[0]?.Description) || "Item",
+                         quantity: parseFloat(getText(l.InvoicedQuantity) || 1),
+                         unit_price: parseFloat(getText(l.Price?.[0]?.PriceAmount) || 0)
+                     })) || [],
+                     total_amount: parseFloat(getText(inv.LegalMonetaryTotal?.[0]?.PayableAmount) || 0)
+                 };
+            }
+
+            // 2. Fallback for simpler JSON structure (if any)
+            const findVal = (obj, keys) => {
+                if (!obj) return null;
+                const lowerKeys = keys.map(k => k.toLowerCase());
+                for (const k of Object.keys(obj)) {
+                    if (lowerKeys.includes(k.toLowerCase())) return obj[k];
+                }
+                return null;
+            };
+
+            const buyerObj = findVal(data, ['buyer', 'Buyer', 'BuyerDetails', 'buyer_details']) || data;
+            const buyerName = findVal(buyerObj, ['name', 'BuyerName', 'buyer_name', 'entity_name']) || findVal(data, ['buyer_name', 'BuyerName']) || "N/A";
+            const buyerTin = findVal(buyerObj, ['tin', 'TIN', 'TaxID', 'tax_id']) || findVal(data, ['buyer_tin', 'TIN']) || "N/A";
+            const buyerId = findVal(buyerObj, ['id_number', 'RegistrationNumber', 'reg_id', 'id']) || "N/A";
+            const buyerEmail = findVal(buyerObj, ['email', 'Email', 'contact_email']) || "N/A";
+            const buyerAddress = findVal(buyerObj, ['address', 'Address', 'billing_address', 'postal_address']) || "N/A";
+            const activity = findVal(buyerObj, ['business_activity', 'activity', 'BuyerActivity']) || findVal(data, ['buyer_activity']) || "General Trade";
+
+            const supplierObj = findVal(data, ['supplier', 'Supplier', 'SupplierDetails']) || data;
+            const supplierName = findVal(supplierObj, ['name', 'SupplierName', 'supplier_name']) || "N/A";
+            const supplierTin = findVal(supplierObj, ['tin', 'TIN', 'TaxID', 'tax_id']) || "N/A";
+            const supplierId = findVal(supplierObj, ['id_number', 'RegistrationNumber', 'reg_id', 'id']) || "N/A";
+            const supplierEmail = findVal(supplierObj, ['email', 'Email', 'contact_email']) || "N/A";
+            const supplierAddress = findVal(supplierObj, ['address', 'Address', 'billing_address', 'postal_address']) || "N/A";
+
+            const msic = findVal(data, ['msic_code', 'MSIC', 'msic']) || "N/A";
+            const total = findVal(data, ['total_amount', 'TotalAmount', 'total_payable', 'TotalPayable', 'total']) || 0;
+
+            let items = findVal(data, ['line_items', 'LineItems', 'items', 'products', 'lines']) || [];
+            if (!Array.isArray(items)) items = [];
+            
+            const normalizedItems = items.map(item => ({
+                description: findVal(item, ['description', 'desc', 'Item', 'name']) || "Item",
+                quantity: parseFloat(findVal(item, ['quantity', 'qty', 'count']) || 1),
+                unit_price: parseFloat(findVal(item, ['unit_price', 'price', 'amount', 'rate']) || 0)
+            }));
+
+            return {
+                supplier: {
+                    name: supplierName,
+                    tin: supplierTin,
+                    id_number: supplierId,
+                    email: supplierEmail,
+                    address: supplierAddress
+                },
+                buyer: {
+                    name: buyerName,
+                    tin: buyerTin,
+                    id_number: buyerId,
+                    email: buyerEmail,
+                    address: buyerAddress
+                },
+                msic_code: msic,
+                buyer_activity: activity,
+                line_items: normalizedItems,
+                total_amount: parseFloat(total)
+            };
+        };
+
+        const parseRawText = (text) => {
+            const extract = (pattern) => {
+                const match = text.match(pattern);
+                return match ? match[1].trim() : null;
+            };
+
+            const buyerName = extract(/(?:Buyer Name|Billing Address|Customer Name)[:\s*]+([^\n]+)/i) || "CASH SALES";
+            const buyerTin = extract(/(?:TIN|Tax ID)[:\s*]+([A-Z0-9-]+|Not applicable)/i) || "NA";
+            const supplierName = extract(/(?:Supplier Name|Merchant|Vendor)[:\s*]+([^\n]+)/i) || "N/A";
+            const supplierId = extract(/(?:Supplier Reg|Company No|Co No)[:\s*]+([A-Z0-9-]+)/i) || "N/A";
+            const supplierEmail = extract(/(?:Supplier Email)[:\s*]+([^\n]+)/i) || "N/A";
+            const supplierAddress = extract(/(?:Supplier Address|Address)[:\s*]+([^\n]+)/i) || "N/A";
+
+            const totalStr = extract(/(?:Total Payable|Total Amount|Total Price)[:\s*]+(?:RM|MYR)?\s*([\d,.]+)/i) || "0.00";
+            const totalVal = parseFloat(totalStr.replace(/,/g, ''));
+            const msic = extract(/(?:MSIC Code|MSIC)[:\s*]+(\d+)/i);
+
+            const items = [{
+                description: "Item from Invoice (See extracted details)",
+                quantity: 1,
+                unit_price: totalVal || 0
+            }];
+
+            return {
+                supplier: {
+                    name: supplierName,
+                    tin: "N/A",
+                    id_number: supplierId,
+                    email: supplierEmail,
+                    address: supplierAddress
+                },
+                buyer: {
+                    name: buyerName,
+                    tin: buyerTin,
+                    id_number: "N/A",
+                    email: "N/A",
+                    address: buyerName // Often address is mixed with name in simple regex
+                },
+                msic_code: msic || "N/A",
+                buyer_activity: "General Trade",
+                line_items: items,
+                total_amount: totalVal || 0
+            };
+        };
+
+        // --- MAIN APP ---
+        const App = () => {
+            const [isDark, setIsDark] = useState(true);
+            const [lang, setLang] = useState('en');
+            const [config, setConfig] = useState({
+                projectId: localStorage.getItem('JAMAI_PROJECT_ID') || '',
+                apiKey: localStorage.getItem('JAMAI_API_KEY') || '',
+                tableId: localStorage.getItem('JAMAI_TABLE_ID') || 'MyInvois',
+                chatTableId: localStorage.getItem('JAMAI_CHAT_ID') || 'EzBill_Chat'
+            });
+            const [showConfig, setShowConfig] = useState(false);
+            const [file, setFile] = useState(null);
+            const [preview, setPreview] = useState(null);
+            const [status, setStatus] = useState('idle');
+            const [result, setResult] = useState(null);
+            const [rawResult, setRawResult] = useState(null); // Added for storing raw JSON
+            const [isValid, setIsValid] = useState(true); // Added validation state
+            const [logs, setLogs] = useState([]);
+            const logEndRef = useRef(null);
+
+            const txt = t[lang];
+
+            useEffect(() => {
+                const root = window.document.documentElement;
+                if (isDark) root.classList.add('dark'); else root.classList.remove('dark');
+            }, [isDark]);
+
+            const toggleTheme = () => setIsDark(!isDark);
+            const toggleLang = () => setLang(prev => prev === 'en' ? 'bm' : 'en');
+
+            const saveConfig = (newConfig) => {
+                localStorage.setItem('JAMAI_PROJECT_ID', newConfig.projectId);
+                localStorage.setItem('JAMAI_API_KEY', newConfig.apiKey);
+                localStorage.setItem('JAMAI_TABLE_ID', newConfig.tableId);
+                localStorage.setItem('JAMAI_CHAT_ID', newConfig.chatTableId);
+                setConfig(newConfig);
+            };
+
+            const addLog = (msgKey, type = 'info') => {
+                const msg = t[lang][msgKey] || msgKey; 
+                const prefix = type === 'success' ? '✓' : type === 'error' ? '!' : '>';
+                setLogs(prev => [...prev, { time: new Date().toLocaleTimeString(), msg, prefix, type }]);
+            };
+            
+            useEffect(() => { if (logEndRef.current) logEndRef.current.scrollIntoView({ behavior: "smooth" }); }, [logs]);
+
+            const handleFileChange = (e) => {
+                const selected = e.target.files[0];
+                if (selected) {
+                    setFile(selected);
+                    setPreview(URL.createObjectURL(selected));
+                    setStatus('idle');
+                    setResult(null);
+                    setRawResult(null); // Reset raw result
+                    setIsValid(true);
+                    setLogs([]);
+                    addLog(`File: ${selected.name}`);
+                    e.target.value = ''; 
+                }
+            };
+            
+            const validateData = (data) => {
+                const missingFields = [];
+                // Check Supplier Name (mandatory)
+                if (!data.supplier?.name || data.supplier.name === "N/A" || data.supplier.name.trim() === "") {
+                    missingFields.push("Supplier Name");
+                }
+                // Check Buyer Name (mandatory) - Cash Sales is Invalid
+                const bName = data.buyer?.name;
+                if (!bName || bName === "N/A" || bName.trim() === "" || bName.toUpperCase() === "CASH SALES") {
+                    missingFields.push("Buyer Name (Cash Sales invalid)");
+                }
+                // Buyer TIN validation removed as per request to simplify buyer data
+                
+                return missingFields;
+            };
+
+            const handleScan = async () => {
+                if (!config.apiKey || !config.projectId) { 
+                    // DEMO MODE MOCKUP
+                    addLog("demoMode", 'info');
+                    setStatus('processing');
+                    setTimeout(() => {
+                        const demoData = {
+                            supplier: {
+                                name: "Klinik Kesihatan Maju Sdn Bhd",
+                                tin: "C26728153060",
+                                id_number: "201901039912",
+                                email: "admin@kkmaju.com.my",
+                                address: "123, Jalan Kesihatan, 50000 KL"
+                            },
+                            buyer: {
+                                name: "Ahmad Albab",
+                                tin: "IG1092384029",
+                                id_number: "202301009988",
+                                email: "accounts@kkmaju.com.my",
+                                address: "45, Lorong Damai, 43000 Kajang"
+                            },
+                            msic_code: "86101",
+                            buyer_activity: "Medical Services (General)",
+                            line_items: [
+                                { description: "Consultation Fee", quantity: 1, unit_price: 50.00 },
+                                { description: "Medication - Paracetamol", quantity: 2, unit_price: 12.50 }
+                            ],
+                            total_amount: 75.00
+                        };
+                        setResult(demoData);
+                        setRawResult(demoData);
+                        setIsValid(true);
+                        setStatus('done');
+                        addLog("demoComplete", 'success');
+                    }, 2000);
+                    return;
+                }
+
+                if (!file) { addLog("Input stream empty.", 'error'); return alert("Please upload a receipt!"); }
+
+                setStatus('uploading');
+                addLog("File Encrypting & Uploading..."); 
+
+                try {
+                    // 1. UPLOAD FILE TO JAMAI
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    const uploadReq = await fetch("https://api.jamaibase.com/api/v1/files/upload", {
+                        method: "POST",
+                        headers: { "Authorization": `Bearer ${config.apiKey}`, "X-PROJECT-ID": config.projectId },
+                        body: formData
+                    });
+
+                    if (!uploadReq.ok) {
+                        const errText = await uploadReq.text();
+                        if (uploadReq.status === 402 || uploadReq.status === 403 || errText.includes("insufficient_credits")) {
+                            throw new Error("Insufficient JamAI Credits. Please top up or use Demo Mode (clear API settings).");
+                        }
+                        throw new Error("Upload failed.");
+                    }
+                    const uploadRes = await uploadReq.json();
+                    const fileUri = uploadRes.uri;
+                    addLog("fileEncrypted", 'success');
+
+                    // 2. TRIGGER ACTION TABLE (MyInvois)
+                    setStatus('processing');
+                    addLog("neuralEngine", 'info');
+
+                    const actionReq = await fetch("https://api.jamaibase.com/api/v1/gen_tables/action/rows/add", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${config.apiKey}`,
+                            "X-PROJECT-ID": config.projectId,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            "table_id": config.tableId, // Uses the OCR Table ID
+                            "data": [{ "Receipt_Image": fileUri }], // Sends URI to Receipt_Image column
+                            "stream": false,
+                            "optimize": false 
+                        })
+                    });
+
+                    if (!actionReq.ok) {
+                        const errText = await actionReq.text();
+                        console.error("JamAI API Error:", errText);
+                        
+                        if (actionReq.status === 402 || actionReq.status === 403 || errText.includes("insufficient_credits")) {
+                            throw new Error("Insufficient JamAI Credits. Please top up or use Demo Mode (clear API settings).");
+                        }
+                        
+                        throw new Error(`API Error: ${actionReq.status} - ${errText}`);
+                    }
+                    const actionRes = await actionReq.json();
+                    console.log("Action Response:", actionRes); // Log for debugging
+
+                    // 3. EXTRACT AND CLEAN JSON
+                    if (actionRes.rows && actionRes.rows.length > 0) {
+                        const row = actionRes.rows[0];
+                        const cols = row.columns;
+                        
+                        const getColText = (c) => {
+                             if (!c) return null;
+                             if (typeof c === 'string') return c;
+                             if (c.text) return c.text;
+                             if (c.value) return c.value;
+                             if (c.choices && c.choices.length > 0) return c.choices[0].message?.content || c.choices[0].text;
+                             return null;
+                        };
+
+                        let rawText = getColText(cols["Final_LHDN_JSON"]);
+                        if (!rawText) rawText = getColText(cols["Extracted_Data"]);
+                        
+                        if (!rawText) {
+                            console.error("Available Columns:", Object.keys(cols));
+                            throw new Error("Columns 'Final_LHDN_JSON' or 'Extracted_Data' are empty. Check Table ID.");
+                        }
+
+                        if (typeof rawText === 'string') {
+                            rawText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+                        }
+                        
+                        addLog("neuralComplete", 'success');
+
+                        let finalData = null;
+
+                        try {
+                            // Attempt 1: Parse as JSON
+                            const parsedData = JSON.parse(rawText);
+                            setRawResult(parsedData); // Store the original, complex JSON
+                            finalData = normalizeData(parsedData); // Normalize for dashboard display
+                            console.log("Parsed JSON successfully:", finalData);
+                        } catch (parseErr) {
+                            console.warn("JSON Parse Failed. Attempting Regex Text Extraction...", parseErr);
+                            // Attempt 2: Parse as Raw Text
+                            finalData = parseRawText(rawText);
+                            setRawResult(finalData); // Fallback: copy what we have
+                            console.log("Extracted from Text:", finalData);
+                        }
+
+                        if (finalData) {
+                            const errors = validateData(finalData);
+                            setIsValid(errors.length === 0);
+                            setResult(finalData);
+                            setStatus('done');
+                        } else {
+                             throw new Error("Failed to extract structured data from AI response.");
+                        }
+
+                    } else {
+                        throw new Error("Processing error: No successful action response received (Rows empty).");
+                    }
+
+                } catch (err) {
+                    console.error(err);
+                    setStatus('error');
+                    addLog(err.message, 'error');
+                }
+            };
+
+            const handleCopyJSON = () => {
+                // Prefer copying the raw, un-normalized result if available
+                const dataToCopy = rawResult || result;
+                if(!dataToCopy) return;
+                navigator.clipboard.writeText(JSON.stringify(dataToCopy, null, 2));
+                addLog("jsonCopied", 'success');
+                alert(txt.jsonCopied);
+            };
+
+            const handleSubmit = () => {
+                if(!result) return;
+                
+                const errors = validateData(result);
+                if (errors.length > 0) {
+                     addLog(`Validation Failed: ${errors.join(', ')}`, 'error');
+                     addLog("400 BadStructure: Mandatory fields are missing or invalid.", 'error');
+                     return;
+                }
+
+                addLog("202 Accepted: Document queued for validation.", 'success');
+                addLog("transmitting", 'info');
+                setTimeout(() => {
+                    addLog("transmitSuccess", 'success');
+                    alert(txt.submitted);
+                }, 1000);
+            };
+
+            return (
+                <div className="min-h-screen flex flex-col transition-colors duration-300 relative overflow-hidden">
+                    {/* Background Blobs */}
+                    <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-brand-300/20 dark:bg-brand-900/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+                        <div className="absolute top-[20%] right-[-10%] w-96 h-96 bg-bill-400/20 dark:bg-bill-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+                    </div>
+
+                    <nav className="glass-panel border-b border-white/20 dark:border-white/5 px-6 py-4 flex justify-between items-center sticky top-0 z-20">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-brand-5 dark:bg-brand-950 p-2.5 rounded-xl border border-brand-100 dark:border-brand-800 shadow-sm">
+                                <Icon name="scan-line" className="text-brand-600 dark:text-brand-400 w-6 h-6" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                                    Ez<span className="text-bill-500 dark:text-bill-400">Bill</span>
+                                </h1>
+                                <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-slate-400 dark:text-brand-400/60">{txt.subtitle}</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <TopControls isDark={isDark} toggleTheme={toggleTheme} lang={lang} toggleLang={toggleLang} />
+                            <div className="h-6 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
+                            <button onClick={() => setShowConfig(true)} className="flex items-center gap-2 text-slate-500 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400 transition font-medium text-sm px-2">
+                                <Icon name="settings" className="w-4 h-4" />
+                            </button>
+                            <a href="#" className="btn-primary px-5 py-2 rounded-lg text-sm shadow-lg flex items-center gap-2 no-underline hover:text-white dark:hover:text-black">
+                                <Icon name="download" className="w-4 h-4" /> {txt.extension}
+                            </a>
+                        </div>
+                    </nav>
+
+                    <main className="flex-1 container mx-auto p-6 max-w-7xl flex flex-col md:flex-row gap-8 relative z-10 mt-4">
+                        
+                        <div className="w-full md:w-5/12 space-y-6 flex flex-col">
+                            <div className={`glass-panel rounded-2xl p-2 relative overflow-hidden group transition-all duration-500 ${file ? 'border-brand-400 dark:border-brand-500/50 ring-4 ring-brand-50 dark:ring-brand-900/30' : 'hover:border-brand-300 dark:hover:border-brand-700'}`}>
+                                <input type="file" id="upload" className="hidden" onChange={handleFileChange} accept="image/*,.pdf" />
+                                <div className="bg-slate-50 dark:bg-dark-surface/50 rounded-xl p-8 text-center relative overflow-hidden h-full flex flex-col justify-center min-h-[380px] border-2 border-dashed border-slate-300 dark:border-slate-700 group-hover:border-brand-400 dark:group-hover:border-brand-500 transition-colors">
+                                    {!preview ? (
+                                        <label htmlFor="upload" className="cursor-pointer flex flex-col items-center group-hover:scale-105 transition-transform">
+                                            <div className="bg-brand-50 dark:bg-brand-900/30 p-6 rounded-full mb-6 text-brand-600 dark:text-brand-400 shadow-sm">
+                                                <Icon name="upload-cloud" className="w-12 h-12" />
+                                            </div>
+                                            <h2 className="text-xl font-bold text-slate-700 dark:text-white mb-2">{txt.uploadTitle}</h2>
+                                            <p className="text-slate-500 dark:text-slate-400 font-mono text-xs uppercase tracking-wide">{txt.uploadDesc}</p>
+                                        </label>
+                                    ) : (
+                                        <div className="relative h-full flex items-center justify-center overflow-hidden rounded-lg bg-slate-100 dark:bg-black/50 w-full">
+                                            {file && file.type === "application/pdf" ? (
+                                                <iframe src={preview} className="w-full h-full border-none rounded-lg" title="PDF Preview"></iframe>
+                                            ) : (
+                                                <img src={preview} alt="Receipt" className="max-h-full max-w-full object-contain" />
+                                            )}
+                                            
+                                            {(status === 'uploading' || status === 'processing') && (
+                                                <div className="absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center">
+                                                    <div className="w-16 h-16 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+                                                </div>
+                                            )}
+                                            
+                                            <button onClick={() => {setFile(null); setPreview(null); setStatus('idle');}} className="absolute top-3 right-3 bg-white dark:bg-black p-2 rounded-full shadow-md text-red-500 hover:text-red-600 transition z-20">
+                                                <Icon name="x" className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                             <div className="glass-panel p-1 rounded-xl flex-1 flex flex-col min-h-[220px] shadow-lg">
+                                <div className="bg-white/50 dark:bg-dark-surface/60 rounded-lg p-4 h-full flex flex-col">
+                                    <h4 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-3 font-mono flex items-center gap-2 border-b border-slate-100 dark:border-slate-700/50 pb-2">
+                                        <Icon name="terminal-square" className="w-4 h-4" /> {txt.logsTitle}
+                                    </h4>
+                                    <div className="flex-1 overflow-y-auto font-mono text-xs space-y-2 pr-2">
+                                        {logs.length === 0 ? <span className="text-slate-400 italic">{txt.logsReady}<span className="animate-pulse">_</span></span> : logs.map((l, i) => (
+                                            <div key={i} className={`flex gap-2 ${l.type === 'success' ? 'text-brand-700 dark:text-brand-400' : l.type === 'error' ? 'text-red-600 dark:text-red-400' : 'text-slate-600 dark:text-slate-400'}`}>
+                                                <span className="opacity-50">[{l.time}]</span> <span className="font-bold">{l.prefix}</span> <span>{l.msg}</span>
+                                            </div>
+                                        ))}
+                                        {status === 'processing' && <div className="text-bill-600 dark:text-bill-400 animate-pulse mt-2 font-bold">{txt.validatingTax}</div>}
+                                        <div ref={logEndRef}></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="w-full md:w-7/12 flex flex-col gap-6">
+                             <button 
+                                onClick={handleScan} 
+                                disabled={status === 'uploading' || status === 'processing'}
+                                className={`action-button w-full py-5 rounded-xl text-xl shadow-xl transition-all transform hover:scale-[1.01] relative overflow-hidden group flex items-center justify-center gap-3
+                                ${(status === 'uploading' || status === 'processing') ? '!bg-gray-300 !text-gray-500 cursor-not-allowed dark:!bg-slate-800 dark:!text-slate-500' : ''}`}
+                            >
+                                {status === 'uploading' ? <><Icon name="upload" className="animate-bounce" /> {txt.btnUpload}</> : 
+                                 status === 'processing' ? <><Icon name="brain-circuit" className="animate-spin" /> {txt.btnProcess}</> : 
+                                 <><Icon name="zap" /> {txt.btnAction}</>}
+                            </button>
+
+                            <div className={`glass-panel p-1 rounded-2xl flex-1 flex flex-col transition-all duration-500 shadow-2xl ${result ? (isValid ? 'border-brand-500/30 ring-4 ring-brand-500/10 dark:ring-brand-500/20' : 'border-red-500/30 ring-4 ring-red-500/10 dark:ring-red-500/20') : ''}`}>
+                                <div className="bg-white dark:bg-dark-surface/90 rounded-xl flex-1 flex flex-col overflow-hidden">
+                                    <div className="bg-slate-50 dark:bg-white/5 px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
+                                        <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                                            <Icon name="database" className="text-brand-600 dark:text-brand-400" /> {txt.resultsTitle}
+                                        </h3>
+                                        {result && (
+                                            <span className={`text-xs px-3 py-1 rounded-full font-bold font-mono border flex items-center gap-1 shadow-sm ${isValid ? 'bg-brand-100 text-brand-800 border-brand-200 dark:bg-brand-900/50 dark:text-brand-300 dark:border-brand-700' : 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/50 dark:text-red-300 dark:border-red-700'}`}>
+                                                <Icon name={isValid ? "check-circle" : "alert-circle"} className="w-3 h-3" /> 
+                                                {isValid ? txt.compliant : txt.invalid}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div className="p-6 flex-1 overflow-y-auto relative bg-white dark:bg-transparent">
+                                        {!result ? (
+                                            <div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-600">
+                                                <Icon name="file-scan" className="w-24 h-24 mb-6 opacity-80" />
+                                                <p className="text-lg font-mono tracking-widest font-bold opacity-60">{txt.noData}</p>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                                
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                    <div>
+                                                        <h4 className="text-xs font-bold text-slate-400 dark:text-brand-400/80 uppercase mb-4 flex items-center gap-2 font-mono tracking-wider border-b border-slate-100 dark:border-white/10 pb-2">
+                                                            <Icon name="store" className="w-4 h-4" /> {txt.supplierInfo} <span className="text-[10px] text-red-500">*</span>
+                                                        </h4>
+                                                        <div className="space-y-4">
+                                                            <InputGroup label={txt.entityName} value={result.supplier?.name} readOnly={true} icon={<Icon name="building" className="w-4 h-4" />} />
+                                                            <InputGroup label={txt.tin} value={result.supplier?.tin} readOnly={true} icon={<Icon name="hash" className="w-4 h-4" />} />
+                                                            <InputGroup label={txt.regId} value={result.supplier?.id_number} readOnly={true} icon={<Icon name="credit-card" className="w-4 h-4" />} />
+                                                            <InputGroup label={txt.address} value={result.supplier?.address} readOnly={true} icon={<Icon name="map-pin" className="w-4 h-4" />} />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-xs font-bold text-slate-400 dark:text-brand-400/80 uppercase mb-4 flex items-center gap-2 font-mono tracking-wider border-b border-slate-100 dark:border-white/10 pb-2">
+                                                            <Icon name="user-circle" className="w-4 h-4" /> {txt.buyerInfo} <span className="text-[10px] text-red-500">*</span>
+                                                        </h4>
+                                                        <div className="space-y-4">
+                                                            <InputGroup label={txt.entityName} value={result.buyer?.name} readOnly={true} icon={<Icon name="building-2" className="w-4 h-4" />} />
+                                                            <InputGroup label={txt.address} value={result.buyer?.address} readOnly={true} icon={<Icon name="map-pin" className="w-4 h-4" />} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-bill-50 dark:bg-bill-900/10 p-5 rounded-xl border border-bill-100 dark:border-bill-800/30">
+                                                    <h4 className="text-xs font-bold text-bill-600 dark:text-bill-400 uppercase mb-3 flex items-center gap-2 font-mono">
+                                                        <Icon name="brain-circuit" className="w-4 h-4" /> {txt.ragTitle}
+                                                    </h4>
+                                                    <div>
+                                                        <label className="text-[10px] text-bill-400 dark:text-bill-500 font-mono uppercase tracking-wider block mb-1">{txt.msicCode}</label>
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="bg-white dark:bg-black/40 px-4 py-2 rounded border border-bill-200 dark:border-bill-700 font-bold text-xl text-bill-700 dark:text-bill-200 font-mono inline-block shadow-sm">
+                                                                {result.msic_code || "N/A"}
+                                                            </div>
+                                                            <span className="text-xs text-bill-500 dark:text-bill-400/60 font-medium italic">
+                                                                {txt.matched} {result.buyer?.business_activity || result.buyer_activity || "General Trade"}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <h4 className="text-xs font-bold text-slate-400 dark:text-brand-400/80 uppercase mb-4 font-mono border-b border-slate-100 dark:border-white/10 pb-2">{txt.lineItems}</h4>
+                                                    <div className="rounded-lg border border-slate-200 dark:border-white/10 overflow-hidden">
+                                                        <table className="w-full text-sm text-left font-mono bg-slate-50/50 dark:bg-white/5">
+                                                            <thead className="bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400">
+                                                                <tr>
+                                                                    <th className="p-3 font-bold">{txt.desc}</th>
+                                                                    <th className="p-3 text-center font-bold">{txt.qty}</th>
+                                                                    <th className="p-3 text-right font-bold">{txt.price}</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody className="divide-y divide-slate-200 dark:divide-white/5 bg-white dark:bg-transparent">
+                                                                {result.line_items?.map((item, idx) => (
+                                                                    <tr key={idx} className="hover:bg-brand-50 dark:hover:bg-white/5 transition">
+                                                                        <td className="p-3 text-slate-700 dark:text-slate-300">{item.description}</td>
+                                                                        <td className="p-3 text-center text-slate-600 dark:text-slate-400">{item.quantity}</td>
+                                                                        <td className="p-3 text-right font-bold text-slate-800 dark:text-brand-400"><AnimatedCounter value={item.unit_price} /></td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex justify-between items-center pt-6 border-t border-slate-200 dark:border-white/10">
+                                                    <span className="font-bold text-lg text-slate-700 dark:text-slate-300 font-mono uppercase tracking-widest">{txt.total}</span>
+                                                    <div className="text-4xl font-black text-slate-900 dark:text-brand-400 font-mono flex items-baseline gap-1">
+                                                        <span className="text-xl font-medium text-slate-400 dark:text-brand-600">RM</span>
+                                                        <AnimatedCounter value={result.total_amount} />
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Footer Buttons - High Contrast */}
+                                    <div className="bg-slate-50 dark:bg-white/5 p-6 border-t border-slate-200 dark:border-white/10 flex gap-4">
+                                        <button onClick={handleCopyJSON} disabled={!result} className="flex-1 py-3 border-2 border-slate-900 dark:border-brand-400 rounded font-mono text-sm font-bold flex justify-center gap-2 items-center text-slate-900 dark:text-brand-400 hover:bg-slate-200 dark:hover:bg-brand-400/10 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                                            <Icon name="copy" className="w-4 h-4" /> {txt.copyJson}
+                                        </button>
+                                        {/* High Contrast Submit Button */}
+                                        <button onClick={handleSubmit} disabled={!result} className="flex-1 py-3 bg-black dark:bg-gradient-to-r dark:from-purple-600 dark:to-bill-500 text-white dark:text-white rounded font-mono text-sm font-bold flex justify-center gap-2 items-center shadow-lg hover:shadow-xl hover:scale-[1.02] transition disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none">
+                                            <Icon name="send" className="w-4 h-4" /> {txt.submit}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+
+                    <ConfigModal 
+                        isOpen={showConfig} 
+                        onClose={() => setShowConfig(false)} 
+                        config={config} 
+                        onSave={saveConfig} 
+                        lang={lang}
+                    />
+
+                    <ChatWidget config={config} lang={lang} />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
