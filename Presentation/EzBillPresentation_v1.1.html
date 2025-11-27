@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EzBill | AI Autofill for MyInvois Compliance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Added Playfair Display for professional headings -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'], // Custom Serif
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e', // Success Green
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        dark: '#111827',
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'marquee': 'marquee 25s linear infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        /* Transition Utilities */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+            will-change: opacity, transform;
+        }
+        
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stagger-1 { transition-delay: 100ms; }
+        .stagger-2 { transition-delay: 200ms; }
+        .stagger-3 { transition-delay: 300ms; }
+    </style>
+</head>
+<body class="bg-white text-gray-900 font-sans antialiased overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo with Smooth Scroll to Top -->
+                <a href="#" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); return false;" class="flex items-center gap-2 group cursor-pointer">
+                    <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center text-white font-bold transform group-hover:rotate-12 transition duration-300">
+                        <i class="fa-solid fa-file-invoice"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-gray-900">Ez<span class="text-brand-600">Bill</span></span>
+                </a>
+                
+                <!-- Updated Navigation Links -->
+                <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-600">
+                    <a href="#features" class="hover:text-brand-600 transition hover:-translate-y-0.5 inline-block">Features</a>
+                    <a href="#how-it-works" class="hover:text-brand-600 transition hover:-translate-y-0.5 inline-block">How it Works</a>
+                    <a href="#demo-video" class="hover:text-brand-600 transition hover:-translate-y-0.5 inline-block">Demo</a>
+                    <a href="#architecture" class="hover:text-brand-600 transition hover:-translate-y-0.5 inline-block">Architecture</a>
+                    <a href="#team" class="hover:text-brand-600 transition hover:-translate-y-0.5 inline-block">Our Team</a>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <!-- Updated Button with Arrow -->
+                    <a href="#" class="bg-black text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-gray-800 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 hover:scale-105 active:scale-95 flex items-center gap-2">
+                        Get Started <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="relative pt-32 pb-20 sm:pt-44 sm:pb-24 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            
+            <!-- Tag -->
+            <div class="reveal-on-scroll">
+                <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#f0fdf4] text-[#15803d] text-sm font-semibold mb-10 hover:bg-green-100 transition cursor-default shadow-sm border border-green-100">
+                    <span class="flex h-2 w-2 rounded-full bg-[#22c55e] animate-pulse"></span>
+                    Powered by JamAI Base
+                </div>
+            </div>
+
+            <!-- UPDATED HERO TEXT: MATCHING REFERENCE IMAGE -->
+            <h1 class="text-6xl sm:text-[5.5rem] font-bold tracking-tight text-gray-900 mb-8 max-w-5xl mx-auto leading-[1.1] reveal-on-scroll stagger-1">
+                The <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#10b981] to-[#059669]">Easiest Way</span> to <br>
+                <span class="text-gray-900">e-Invoice.</span>
+            </h1>
+            
+            <div class="mt-8 text-xl sm:text-2xl text-gray-500 max-w-3xl mx-auto mb-12 reveal-on-scroll stagger-2 space-y-2 font-medium">
+                <p>Turn any receipt into a validated e-Invoice in seconds.</p>
+                <p class="text-gray-900 font-bold">
+                    Zero manual entry. Fully compliant.
+                </p>
+            </div>
+
+            <!-- Shortcut Button to Video -->
+            <div class="flex justify-center mb-16 reveal-on-scroll stagger-2 relative z-20">
+                <a href="#demo-video" class="group flex items-center gap-3 px-6 py-3 bg-white text-gray-900 rounded-full border border-gray-200 shadow-lg shadow-gray-100/50 hover:shadow-xl hover:border-brand-300 hover:-translate-y-0.5 transition-all duration-300">
+                    <div class="w-10 h-10 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center border border-brand-100 group-hover:scale-110 group-hover:bg-brand-600 group-hover:text-white transition-all duration-300">
+                        <i class="fa-solid fa-play text-xs ml-1"></i>
+                    </div>
+                    <span class="font-bold text-lg tracking-tight">Watch 1-min Demo</span>
+                </a>
+            </div>
+
+            <!-- Interactive Demo Area (Mimicking GPTInf Input/Output) -->
+            <div class="mt-12 max-w-5xl mx-auto reveal-on-scroll stagger-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-2 bg-gray-50 rounded-3xl border border-gray-200 shadow-2xl transform hover:scale-[1.01] transition duration-500">
+                    
+                    <!-- Left: Input (Receipt) -->
+                    <div class="flex flex-col h-[400px] bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                            <span class="text-sm font-semibold text-gray-500 uppercase tracking-wider"><i class="fa-solid fa-camera mr-2"></i>Raw Receipt Source</span>
+                            <span class="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">Shopee / Grab / Walk-in</span>
+                        </div>
+                        <div class="flex-1 p-6 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 m-4 rounded-xl bg-gray-50 hover:bg-brand-50 hover:border-brand-300 transition cursor-pointer group relative overflow-hidden">
+                            <div class="absolute inset-0 bg-brand-50 opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                            <div class="relative z-10 flex flex-col items-center">
+                                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 group-hover:scale-110 group-hover:rotate-12 transition duration-300">
+                                    <i class="fa-solid fa-cloud-arrow-up text-2xl text-brand-500"></i>
+                                </div>
+                                <p class="text-gray-900 font-medium">Click to upload receipt</p>
+                                <p class="text-sm text-gray-500 mt-2 text-center max-w-xs">Supports JPG, PNG, PDF. <br>Even blurry "kedai runcit" receipts.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Output (JSON/Form) -->
+                    <div class="flex flex-col h-[400px] bg-white rounded-2xl border border-brand-200 shadow-sm overflow-hidden relative">
+                        <div class="p-4 border-b border-brand-100 flex justify-between items-center bg-brand-50/50">
+                            <span class="text-sm font-bold text-brand-700 uppercase tracking-wider"><i class="fa-solid fa-check-circle mr-2"></i>EzBill Ready</span>
+                            <span class="text-xs bg-brand-100 text-brand-700 px-2 py-1 rounded border border-brand-200 animate-pulse">Validation Passed</span>
+                        </div>
+                        <div class="flex-1 p-0 relative bg-slate-900 overflow-hidden group">
+                            <!-- Code Snippet Look -->
+                            <div class="absolute top-0 left-0 w-full h-full p-6 overflow-y-auto custom-scrollbar font-mono text-sm text-green-400">
+<pre>
+{
+  "Validation": "Success",
+  "TIN": "C2384910200",
+  "TaxType": "06 - SST",
+  "Supplier": "GrabFood Merchant",
+  "Items": [
+    {
+      "Desc": "Nasi Lemak Ayam",
+      "Qty": 2,
+      "Price": 15.00,
+      "Class": "Reimbursement"
+    }
+  ],
+  "Total": 31.80,
+  "MyInvois_Status": "Ready to Submit"
+}
+</pre>
+                            </div>
+                            <!-- Floating Action -->
+                            <div class="absolute bottom-6 right-6 transform translate-y-0 opacity-90 hover:opacity-100 transition duration-300">
+                                <button class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-lg shadow-lg shadow-brand-500/20 text-sm font-semibold flex items-center gap-2 transition hover:-translate-y-1">
+                                    <i class="fa-solid fa-paper-plane"></i> Submit to LHDN
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <!-- Trust Indicators -->
+                <div class="mt-8 flex flex-wrap justify-center gap-6 text-gray-400 text-sm font-medium">
+                    <span class="flex items-center gap-2 hover:text-brand-600 transition duration-300 cursor-help"><i class="fa-solid fa-shield-halved"></i> Data Privacy First</span>
+                    <span class="flex items-center gap-2 hover:text-brand-600 transition duration-300 cursor-help"><i class="fa-solid fa-database"></i> Powered by JamAI</span>
+                    <span class="flex items-center gap-2 hover:text-brand-600 transition duration-300 cursor-help"><i class="fa-solid fa-language"></i> Manglish Supported</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Background Decor -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0 pointer-events-none">
+            <div class="absolute top-20 left-10 w-96 h-96 bg-brand-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+            <div class="absolute top-20 right-10 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+        </div>
+    </div>
+
+    <!-- PARALLAX SOLUTION SCROLL SECTION -->
+    <!-- Increased height to 500vh to allow for 5 cards sequence -->
+    <div id="parallax-section" class="relative h-[500vh] bg-gray-50">
+        
+        <!-- Sticky Container -->
+        <div class="sticky top-0 h-screen overflow-hidden flex flex-col items-center justify-center">
+            
+            <!-- Huge Background Text - Darker and More Opaque -->
+            <div class="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
+                <h2 class="text-[13vw] font-bold text-gray-400 leading-[0.8] text-center tracking-tighter uppercase opacity-80">
+                    SME Compliance<br>Struggles
+                </h2>
+            </div>
+
+            <!-- Cards Container -->
+            <div id="parallax-cards-container" class="relative w-full max-w-5xl h-[500px] flex items-center justify-center z-10">
+                
+                <!-- Card 1: ALERT (Modified) -->
+                <div id="p-card-1" class="absolute w-80 md:w-96 min-h-[380px] rounded-3xl p-8 bg-white border-l-[12px] border-l-red-500 shadow-2xl will-change-transform origin-center flex flex-col justify-center transition-shadow duration-300">
+                    <div class="mb-6">
+                        <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-red-50 text-red-500 mb-4 shadow-sm">
+                            <i class="fa-solid fa-bell text-2xl animate-bounce"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-900 font-serif mb-1">Did You Know?</h3>
+                    </div>
+                    
+                    <p class="text-xl text-gray-700 font-medium leading-relaxed">
+                        Starting <span class="text-red-600 font-bold border-b-2 border-red-100">July 2026</span>, SMEs with revenue under <span class="bg-red-50 px-2 py-0.5 rounded text-red-800 font-bold">RM1 million</span> must adopt e-invoicing.
+                    </p>
+                    
+                    <div class="mt-8 pt-6 border-t border-gray-100 flex items-center gap-3 text-sm font-bold text-gray-400 uppercase tracking-widest">
+                         <i class="fa-solid fa-circle-exclamation text-red-500"></i>
+                         <span>Mandatory Compliance</span>
+                    </div>
+                </div>
+
+                <!-- Card 2: Amir -->
+                <div id="p-card-2" class="absolute w-80 md:w-96 min-h-[380px] rounded-3xl p-8 bg-white shadow-2xl will-change-transform origin-center flex flex-col justify-between transition-shadow duration-300">
+                    <div class="relative">
+                        <i class="fa-solid fa-quote-left text-5xl text-blue-100 absolute -top-4 -left-2 opacity-50"></i>
+                        <p class="relative z-10 text-lg text-gray-700 font-medium leading-relaxed pt-4">“Memang penat nak semak invoice satu-satu, lagi-lagi bila banyak sangat pelanggan waktu puncak. Saya cuma nak berniaga, bukan buat admin.”</p>
+                    </div>
+                    <div class="flex items-center gap-4 mt-6 pt-6 border-t border-gray-50">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Amir" alt="Amir" class="w-14 h-14 rounded-full bg-blue-50 p-1 border-2 border-blue-100">
+                        <div>
+                            <p class="text-base font-bold text-gray-900">Amirul H.</p>
+                            <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Penjaja (Hawker) • Penang</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Hafidzi (MICCI) - REPLACED -->
+                <div id="p-card-3" class="absolute w-80 md:w-96 min-h-[380px] rounded-3xl p-8 bg-white shadow-2xl will-change-transform origin-center flex flex-col justify-between transition-shadow duration-300">
+                    <div class="relative">
+                        <i class="fa-solid fa-quote-left text-5xl text-red-100 absolute -top-4 -left-2 opacity-50"></i>
+                        <p class="relative z-10 text-lg text-gray-700 font-medium leading-relaxed pt-4">“The pressure to adopt different compliance requirements at such a critical time could divert attention away from crucial sales opportunities, risking financial setbacks.”</p>
+                    </div>
+                    <div class="flex items-center gap-4 mt-6 pt-6 border-t border-gray-50">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Hafidzi" alt="Hafidzi" class="w-14 h-14 rounded-full bg-red-50 p-1 border-2 border-red-100">
+                        <div>
+                            <p class="text-base font-bold text-gray-900">Hafidzi Razali</p>
+                            <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Spokesperson • MICCI E-commerce</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Farah -->
+                <div id="p-card-4" class="absolute w-80 md:w-96 min-h-[380px] rounded-3xl p-8 bg-white shadow-2xl will-change-transform origin-center flex flex-col justify-between transition-shadow duration-300">
+                    <div class="relative">
+                        <i class="fa-solid fa-quote-left text-5xl text-purple-100 absolute -top-4 -left-2 opacity-50"></i>
+                        <p class="relative z-10 text-lg text-gray-700 font-medium leading-relaxed pt-4">“Now I must navigate unfamiliar invoicing systems while preparing for my busiest sales period during Ramadan.”</p>
+                    </div>
+                    <div class="flex items-center gap-4 mt-6 pt-6 border-t border-gray-50">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Farah" alt="Farah" class="w-14 h-14 rounded-full bg-purple-50 p-1 border-2 border-purple-100">
+                        <div>
+                            <p class="text-base font-bold text-gray-900">Farah Nordiana</p>
+                            <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Keropok Seller • Kuala Besut</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5: Farid -->
+                <div id="p-card-5" class="absolute w-80 md:w-96 min-h-[350px] rounded-3xl p-8 bg-white shadow-2xl border border-gray-100 origin-bottom transition-shadow duration-300 will-change-transform">
+                    <div class="relative">
+                        <i class="fa-solid fa-quote-left text-5xl text-green-100 absolute -top-4 -left-2 opacity-50"></i>
+                        <p class="relative z-10 text-lg text-gray-700 font-medium leading-relaxed pt-4">“I handle multiple clients. I just hope there’s a way to batch convert all these different invoices into valid e-invoices without manual work.”</p>
+                    </div>
+                    <div class="flex items-center gap-4 mt-6 pt-6 border-t border-gray-50">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Farid" alt="Farid" class="w-12 h-12 rounded-full bg-green-50 p-1 border-2 border-green-100">
+                        <div>
+                            <p class="text-base font-bold text-gray-900">Farid A.</p>
+                            <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Freelancer • Remote</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW SECTION: Reality Check (Added Here) -->
+    <div id="problem-stats" class="py-24 bg-white border-y border-gray-100 relative z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal-on-scroll">
+                <span class="text-red-600 font-bold tracking-wide uppercase text-sm bg-red-50 px-3 py-1 rounded-full border border-red-100">The Reality Check</span>
+                <h2 class="text-4xl font-bold text-gray-900 mt-4 font-serif">Is Your Business Ready for July 2026?</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto text-lg">
+                    <span class="font-semibold text-gray-900">Manual invoicing is now obsolete.</span> The old way of accounting is too slow, too risky, and too error-prone for the new digital era.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                
+                <!-- Left: Impact Metrics (Hard Facts) -->
+                <div class="space-y-6 reveal-on-scroll">
+                    <!-- Metric 1: The Fine -->
+                    <div class="bg-red-50 rounded-2xl p-6 border border-red-100 flex items-center gap-5 transition-transform hover:scale-[1.02] cursor-default">
+                        <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-red-600 text-2xl shadow-sm shrink-0">
+                            <i class="fa-solid fa-gavel"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-red-800 uppercase tracking-wider mb-1">Penalty Risk</p>
+                            <div class="text-3xl font-black text-gray-900">RM 20,000</div>
+                            <p class="text-sm text-red-700/80 mt-1">Penalties include fines ranging from RM200 to RM20,000 or imprisonment</p>
+                        </div>
+                    </div>
+
+                    <!-- Metric 2: The Deadline -->
+                    <div class="bg-orange-50 rounded-2xl p-6 border border-orange-100 flex items-center gap-5 transition-transform hover:scale-[1.02] cursor-default">
+                        <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-orange-600 text-2xl shadow-sm shrink-0">
+                            <i class="fa-solid fa-hourglass-half"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-orange-800 uppercase tracking-wider mb-1">Micro-SME Deadline</p>
+                            <div class="text-3xl font-black text-gray-900">July 1, 2026</div>
+                            <p class="text-sm text-orange-700/80 mt-1">Mandatory for businesses with revenue &lt; RM1 Million.</p>
+                        </div>
+                    </div>
+
+                    <!-- Metric 3: The Grace Period -->
+                    <div class="bg-blue-50 rounded-2xl p-6 border border-blue-100 flex items-center gap-5 transition-transform hover:scale-[1.02] cursor-default">
+                        <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-blue-600 text-2xl shadow-sm shrink-0">
+                            <i class="fa-solid fa-hand-holding-heart"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-blue-800 uppercase tracking-wider mb-1">Soft Landing</p>
+                            <div class="text-3xl font-black text-gray-900">6 Months</div>
+                            <p class="text-sm text-blue-700/80 mt-1">Relaxed penalties & consolidated invoices allowed upon implementation.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Concrete Comparison (Problem vs Solution) -->
+                <div class="col-span-1 lg:col-span-1 mt-0 reveal-on-scroll stagger-1">
+                      <div class="space-y-8 relative">
+                        
+                        <!-- The Problem (Manual) -->
+                        <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm relative overflow-hidden group hover:border-red-200 transition-colors">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-gray-100 group-hover:bg-red-500 transition-colors"></div>
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center text-xl">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900">The Manual Way</h3>
+                            </div>
+                            <ul class="space-y-4">
+                                <li class="flex items-start gap-3">
+                                    <i class="fa-solid fa-triangle-exclamation text-red-500 mt-1.5 shrink-0"></i>
+                                    <span class="text-gray-600">High risk of <strong>RM20k fines</strong> due to typos in 53+ mandatory fields.</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i class="fa-solid fa-clock text-red-500 mt-1.5 shrink-0"></i>
+                                    <span class="text-gray-600">Wastes <strong>15-20 mins</strong> per invoice keying in data & verifying TINs.</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i class="fa-solid fa-book-dead text-red-500 mt-1.5 shrink-0"></i>
+                                    <span class="text-gray-600">Requires memorizing complex <strong>LHDN classification codes</strong>.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- The Solution (EzBill) -->
+                        <div class="bg-brand-50 p-8 rounded-3xl border border-brand-200 shadow-md relative overflow-hidden transform md:scale-105 z-10 ring-4 ring-white">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-brand-100 rounded-bl-full opacity-50 -mr-4 -mt-4"></div>
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 bg-brand-500 text-white rounded-xl flex items-center justify-center text-xl shadow-lg shadow-brand-200">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-brand-900">The EzBill Way</h3>
+                            </div>
+                            <ul class="space-y-4">
+                                <li class="flex items-start gap-3">
+                                    <div class="mt-1 bg-white rounded-full p-0.5 shrink-0"><i class="fa-solid fa-circle-check text-brand-500"></i></div>
+                                    <span class="text-brand-800"><strong>100% Compliant</strong> with AI-powered pre-validation checks.</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <div class="mt-1 bg-white rounded-full p-0.5 shrink-0"><i class="fa-solid fa-bolt text-brand-500"></i></div>
+                                    <span class="text-brand-800">Process receipts in <strong>&lt; 2 seconds</strong> via Smart OCR scan.</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <div class="mt-1 bg-white rounded-full p-0.5 shrink-0"><i class="fa-solid fa-wand-magic-sparkles text-brand-500"></i></div>
+                                    <span class="text-brand-800"><strong>Auto-assigns</strong> correct Tax Codes & Classifications instantly.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW SECTION: Media Coverage (Added Here) -->
+    <div class="bg-gray-50 py-20 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Added justify-center to center the header -->
+            <div class="flex items-center justify-center gap-3 mb-10 reveal-on-scroll">
+                <i class="fa-solid fa-newspaper text-2xl text-brand-600"></i>
+                <h2 class="text-2xl font-bold text-gray-900">Media Coverage</h2>
+            </div>
+
+            <!-- UPDATED: Single Column Stack (Line by Line) -->
+            <div class="flex flex-col gap-4 max-w-3xl mx-auto">
+                
+                <!-- Card 1: ClearTax -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-red-500 reveal-on-scroll flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                             <span class="text-xs font-bold text-red-600 uppercase tracking-wide">ClearTax</span>
+                             <span class="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full">Recent</span>
+                        </div>
+                        <p class="text-gray-900 font-medium text-base leading-relaxed">
+                            "Penalties include fines ranging from RM200 to RM20,000 or imprisonment"
+                        </p>
+                    </div>
+                    <a href="https://www.cleartax.com/my/en/einvoice-malaysia-penalties" target="_blank" class="text-brand-600 text-sm font-semibold hover:underline flex items-center gap-1 whitespace-nowrap shrink-0">
+                        Verify Source <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
+
+                <!-- Card 2: The Edge -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-orange-500 reveal-on-scroll stagger-1 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex-1">
+                         <div class="flex items-center gap-3 mb-2">
+                            <span class="text-xs font-bold text-orange-600 uppercase tracking-wide">The Edge Malaysia</span>
+                            <span class="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full">Last Week</span>
+                        </div>
+                        <p class="text-gray-900 font-medium text-base leading-relaxed">
+                            "SMEs face huge challenges in implementing e-invoicing"
+                        </p>
+                    </div>
+                    <a href="https://theedgemalaysia.com/node/721028" target="_blank" class="text-brand-600 text-sm font-semibold hover:underline flex items-center gap-1 whitespace-nowrap shrink-0">
+                        Verify Source <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
+
+                <!-- Card 3: ResearchGate -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-blue-500 reveal-on-scroll stagger-2 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-xs font-bold text-blue-600 uppercase tracking-wide">ResearchGate</span>
+                            <span class="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full">Academic Paper</span>
+                        </div>
+                        <p class="text-gray-900 font-medium text-base leading-relaxed">
+                            "Limited technical readiness makes automated solutions essential for SMEs to survive the e-Invoicing transition."
+                        </p>
+                    </div>
+                    <a href="https://www.researchgate.net/publication/375906951_E-Invoicing_Implementation_and_its_Challenges_to_Small_and_Medium_Size_SME_in_Malaysia_A_Conceptual_Paper" target="_blank" class="text-brand-600 text-sm font-semibold hover:underline flex items-center gap-1 whitespace-nowrap shrink-0">
+                        Read Study <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
+
+                <!-- Card 4: ProCheck -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-purple-500 reveal-on-scroll stagger-3 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-xs font-bold text-purple-600 uppercase tracking-wide">ProCheck</span>
+                            <span class="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full">Guide</span>
+                        </div>
+                        <p class="text-gray-900 font-medium text-base leading-relaxed">
+                            "Full e-Invoice implementation for Micro-SMEs is mandatory starting 1 July 2026."
+                        </p>
+                    </div>
+                    <a href="https://procheck.com.my/e-invoice-implementation-date/" target="_blank" class="text-brand-600 text-sm font-semibold hover:underline flex items-center gap-1 whitespace-nowrap shrink-0">
+                        Verify Source <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION: Why Choose EzBill (Features) - RESTORED FROM YOUR CODE -->
+    <div id="features" class="py-24 bg-gray-50 relative">
+        <!-- Decoration -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+             <div class="absolute -left-10 top-1/4 w-64 h-64 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16 reveal-on-scroll">
+                <h2 class="text-3xl font-bold text-gray-900">Why choose EzBill?</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">We solve the specific pain points of Malaysian SMEs that generic OCR tools miss.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition duration-300 reveal-on-scroll">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl mb-6">
+                        <i class="fa-solid fa-file-invoice"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Smart Malaysian OCR</h3>
+                    <p class="text-gray-600 leading-relaxed">Reads messy "kedai runcit" receipts, Shopee invoices, and GrabFood summaries. Handles "Manglish" and inconsistent date formats effortlessly.</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition duration-300 reveal-on-scroll stagger-1">
+                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center text-xl mb-6">
+                        <i class="fa-solid fa-check-double"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">RAG-Powered Validation</h3>
+                    <p class="text-gray-600 leading-relaxed">Built on <strong>JamAI Base</strong>. It cross-references extracted data with the latest LHDN guidelines to prevent "Error 400" rejections.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition duration-300 reveal-on-scroll stagger-2">
+                    <div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center text-xl mb-6">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Smart Tax & Invoice Chatbot</h3>
+                    <p class="text-gray-600 leading-relaxed">Delivers instant classification, fixes errors with clear explanations, and provides complete guidance for e-invoice submission and compliance.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION: How It Works (Step-by-Step Guide) -->
+    <div id="how-it-works" class="py-24 bg-white border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Header -->
+            <div class="text-center mb-20 reveal-on-scroll">
+                <div class="inline-block mb-4">
+                    <span class="py-1 px-3 rounded-full bg-[#f0fdf4] text-[#15803d] text-xs font-bold uppercase tracking-wider border border-green-100">
+                        Step-by-Step Guide
+                    </span>
+                </div>
+                <h2 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 mb-6 leading-tight">
+                    From Receipt to <br class="hidden sm:block">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#10b981] to-[#059669]">Validated e-Invoice.</span>
+                </h2>
+                <p class="mt-4 text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
+                    Follow this simple workflow on our mobile app or web dashboard to ensure <span class="font-semibold text-gray-900">100% LHDN compliance</span> in under 20 seconds.
+                </p>
+            </div>
+
+            <!-- Steps Container -->
+            <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-12 md:gap-4">
+                
+                <!-- Connecting Line (Desktop Only) -->
+                <div class="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gray-100 -z-10"></div>
+
+                <!-- Step 1 -->
+                <div class="flex flex-col items-center text-center w-full md:w-1/4 reveal-on-scroll stagger-1 relative group">
+                    <div class="w-24 h-24 rounded-full bg-white border-4 border-green-50 shadow-xl flex items-center justify-center mb-6 relative z-10 group-hover:scale-110 transition-transform duration-300">
+                        <div class="w-10 h-10 bg-gray-900 rounded-full absolute -top-2 -right-2 flex items-center justify-center text-white font-bold border-4 border-white">1</div>
+                        <i class="fa-solid fa-camera text-3xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Snap Photo</h3>
+                    <p class="text-gray-500 text-sm">Or upload existing Image</p>
+                </div>
+
+                <!-- Arrow 1 -->
+                <div class="hidden md:block text-gray-300 text-2xl reveal-on-scroll stagger-1">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex flex-col items-center text-center w-full md:w-1/4 reveal-on-scroll stagger-2 relative group">
+                    <div class="w-24 h-24 rounded-full bg-white border-4 border-green-50 shadow-xl flex items-center justify-center mb-6 relative z-10 group-hover:scale-110 transition-transform duration-300">
+                        <div class="w-10 h-10 bg-gray-900 rounded-full absolute -top-2 -right-2 flex items-center justify-center text-white font-bold border-4 border-white">2</div>
+                        <i class="fa-solid fa-wand-magic-sparkles text-3xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">AI Extraction</h3>
+                    <p class="text-gray-500 text-sm">Smart OCR & Data Parsing</p>
+                </div>
+
+                <!-- Arrow 2 -->
+                <div class="hidden md:block text-gray-300 text-2xl reveal-on-scroll stagger-2">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex flex-col items-center text-center w-full md:w-1/4 reveal-on-scroll stagger-3 relative group">
+                    <div class="w-24 h-24 rounded-full bg-white border-4 border-green-50 shadow-xl flex items-center justify-center mb-6 relative z-10 group-hover:scale-110 transition-transform duration-300">
+                        <div class="w-10 h-10 bg-gray-900 rounded-full absolute -top-2 -right-2 flex items-center justify-center text-white font-bold border-4 border-white">3</div>
+                        <i class="fa-solid fa-magnifying-glass text-3xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Review & Verify</h3>
+                    <p class="text-gray-500 text-sm">Confirm auto-filled details</p>
+                </div>
+
+                <!-- Arrow 3 -->
+                <div class="hidden md:block text-gray-300 text-2xl reveal-on-scroll stagger-3">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="flex flex-col items-center text-center w-full md:w-1/4 reveal-on-scroll stagger-1 relative group">
+                    <div class="w-24 h-24 rounded-full bg-green-500 shadow-xl shadow-green-200 flex items-center justify-center mb-6 relative z-10 group-hover:scale-110 transition-transform duration-300">
+                        <div class="w-10 h-10 bg-gray-900 rounded-full absolute -top-2 -right-2 flex items-center justify-center text-white font-bold border-4 border-white">4</div>
+                        <i class="fa-solid fa-check text-4xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">One-Click Submit</h3>
+                    <p class="text-gray-500 text-sm">Sent directly to LHDN MyInvois API</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Video Section (NEW) -->
+    <div id="demo-video" class="py-24 bg-gray-50 border-b border-gray-100 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16 reveal-on-scroll">
+                <span class="text-brand-600 font-bold tracking-wide uppercase text-sm bg-brand-50 px-3 py-1 rounded-full border border-brand-100">See it in Action</span>
+                <h2 class="text-4xl font-bold text-gray-900 mt-4">Watch How EzBill Works</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto text-lg">A quick 1-minute walkthrough of scanning a receipt and submitting an e-Invoice.</p>
+            </div>
+
+            <!-- Video Container -->
+            <div class="max-w-4xl mx-auto reveal-on-scroll stagger-1">
+                <div class="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-gray-900 aspect-video group cursor-pointer">
+                    
+                    <!-- Placeholder Content (Visible when no video is loaded) -->
+                    <!-- User: Replace the 'src' in the iframe below with your actual video URL -->
+                    <!-- Example: https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1 -->
+                    
+                    <div class="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 text-white z-10 group-hover:bg-gray-700 transition duration-300">
+                        <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fa-solid fa-play text-3xl ml-1 text-white"></i>
+                        </div>
+                        <p class="font-medium text-gray-300 group-hover:text-white transition-colors">Click to Play Demo</p>
+                    </div>
+                    
+                    <!-- Real Video Iframe (Uncomment and add src to use) -->
+                    <!-- 
+                    <iframe 
+                        class="absolute inset-0 w-full h-full z-20" 
+                        src="YOUR_VIDEO_URL_HERE" 
+                        title="EzBill Demo Video" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe> 
+                    -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Architecture (New Section - Light Theme) -->
+    <div id="architecture" class="py-24 bg-gray-50 relative overflow-hidden">
+        <!-- Subtle Background Pattern -->
+        <div class="absolute inset-0 opacity-30 pointer-events-none">
+             <div class="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-gray-100 to-transparent"></div>
+             <div class="absolute left-0 bottom-0 w-1/3 h-full bg-gradient-to-r from-gray-100 to-transparent"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-20 reveal-on-scroll">
+                <span class="text-brand-600 font-bold tracking-wide uppercase text-sm bg-brand-50 px-3 py-1 rounded-full border border-brand-100">Tech Stack</span>
+                <h2 class="text-4xl font-bold text-gray-900 mt-4">System Architecture</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto text-lg">Complete data flow from React Client to JamAI Engine and LHDN Integration.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                
+                <!-- Col 1: Ingestion Pipeline -->
+                <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-lg hover:shadow-xl transition duration-300 reveal-on-scroll">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-xl border border-purple-100">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900">1. Secure Ingestion</h3>
+                    </div>
+                    <ul class="space-y-3 relative">
+                        <li class="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100 z-10 relative">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
+                            <span class="text-sm font-bold text-gray-700">React Client Wrapper</span>
+                        </li>
+                        <li class="flex justify-center py-0 text-gray-300"><i class="fa-solid fa-arrow-down"></i></li>
+                        <li class="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100 z-10 relative">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
+                            <span class="text-sm font-medium text-gray-600">Secure File Upload</span>
+                        </li>
+                        <li class="flex justify-center py-0 text-gray-300"><i class="fa-solid fa-arrow-down"></i></li>
+                        <li class="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100 z-10 relative">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
+                            <span class="text-sm font-medium text-gray-600">Encryption & Storage</span>
+                        </li>
+                        <li class="flex justify-center py-0 text-gray-300"><i class="fa-solid fa-arrow-down"></i></li>
+                        <li class="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100 z-10 relative">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
+                            <span class="text-sm font-medium text-gray-600">File URI Generation</span>
+                        </li>
+                        <li class="flex justify-center py-0 text-gray-300"><i class="fa-solid fa-arrow-down"></i></li>
+                        <li class="flex items-center gap-3 bg-green-50 p-3 rounded-xl border border-green-100 z-10 relative">
+                            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span class="text-sm font-bold text-green-700">Upload Success</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Col 2: Processing Core (The Main Engine) -->
+                <div class="bg-white p-8 rounded-3xl border-2 border-brand-100 shadow-2xl shadow-brand-100/50 transition duration-300 reveal-on-scroll stagger-1 transform scale-105 z-10 relative">
+                    <div class="absolute top-0 right-0 bg-brand-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl rounded-tr-2xl uppercase tracking-wide">JamAI Engine</div>
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center text-xl border border-brand-100">
+                            <i class="fa-solid fa-microchip"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900">2. Processing Core</h3>
+                    </div>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 bg-brand-50 p-3 rounded-xl border border-brand-200 shadow-sm">
+                            <div class="w-2 h-2 bg-brand-600 rounded-full animate-pulse"></div>
+                            <span class="text-sm font-bold text-brand-900">JamAI Action Table</span>
+                        </li>
+                        <li class="flex justify-center py-0 text-brand-200"><i class="fa-solid fa-arrow-down"></i></li>
+                        
+                        <!-- Parallel Step -->
+                        <li class="grid grid-cols-2 gap-2">
+                            <div class="bg-gray-50 p-2 rounded-lg border border-gray-100 text-center text-xs font-medium text-gray-600">OCR Extraction</div>
+                            <div class="bg-gray-50 p-2 rounded-lg border border-gray-100 text-center text-xs font-medium text-gray-600">Neural Classif.</div>
+                        </li>
+
+                        <li class="flex justify-center py-0 text-gray-300"><i class="fa-solid fa-arrow-down"></i></li>
+                        <li class="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                            <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                            <span class="text-sm font-medium text-gray-600">Data Normalization</span>
+                        </li>
+                        
+                        <li class="flex justify-center py-0 text-gray-300"><i class="fa-solid fa-arrow-down"></i></li>
+                        <li class="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span class="text-sm font-bold text-gray-700">Compliance Validation</span>
+                        </li>
+
+                        <!-- Branching Output -->
+                        <li class="flex justify-center py-0 text-gray-300 relative">
+                            <i class="fa-solid fa-code-branch rotate-180 text-sm"></i>
+                        </li>
+
+                        <li class="grid grid-cols-2 gap-2">
+                            <div class="bg-green-50 p-2 rounded-lg border border-green-100 text-center text-xs font-bold text-green-700">Structured JSON</div>
+                            <div class="bg-green-50 p-2 rounded-lg border border-green-100 text-center text-xs font-bold text-green-700">Valid Badge</div>
+                        </li>
+
+                        <!-- LHDN Connection -->
+                        <li class="flex justify-center py-2 text-gray-300"><i class="fa-solid fa-arrow-down"></i></li>
+                        <li class="bg-white p-3 rounded-xl border border-gray-200 text-gray-900 shadow-md">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-mono text-gray-500">External</span>
+                                <span class="text-xs font-bold text-gray-900">LHDN MyInvois API</span>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded text-center text-xs font-mono text-green-600 border border-gray-200">
+                                &darr; Returns e-Invoice ID
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Intelligence -->
+                <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-lg hover:shadow-xl transition duration-300 reveal-on-scroll stagger-2">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl border border-blue-100">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900">3. Chat Intelligence</h3>
+                    </div>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span class="text-sm font-bold text-gray-700">Chat Assistant RAG</span>
+                        </li>
+                        <li class="flex justify-center py-0 text-gray-300"><i class="fa-solid fa-arrow-down"></i></li>
+                        <li class="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span class="text-sm font-medium text-gray-600">Prompt Engineering</span>
+                        </li>
+                        <li class="flex justify-center py-0 text-gray-300"><i class="fa-solid fa-arrow-down"></i></li>
+                        <li class="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span class="text-sm font-medium text-gray-600">Context Retrieval</span>
+                        </li>
+                        <li class="flex justify-center py-0 text-gray-300"><i class="fa-solid fa-arrow-down"></i></li>
+                        <li class="flex items-center gap-3 bg-green-50 p-3 rounded-xl border border-green-100">
+                            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span class="text-sm font-bold text-green-700">Chat Response</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Section -->
+    <div id="team" class="py-24 bg-gray-50 relative overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-20 reveal-on-scroll">
+                <h2 class="text-4xl font-bold text-gray-900 tracking-tight font-serif">Meet the Builders</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto text-lg">The passionate group of 5 experts behind EzBill's innovation.</p>
+            </div>
+
+            <!-- Team Grid: Max width 5xl forces wrapping after 3 items -->
+            <div class="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto">
+                
+                <!-- Member 1: Tan Chee Keat -->
+                <div class="group relative w-80 bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 overflow-hidden reveal-on-scroll">
+                    <!-- Hover Gradient Background -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-brand-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <div class="relative z-10 flex flex-col items-center text-center">
+                        <div class="relative mb-6">
+                            <div class="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-gray-100 to-gray-200 group-hover:from-brand-400 group-hover:to-brand-600 transition-colors duration-500">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=CheeKeat" alt="Tan Chee Keat" class="w-full h-full rounded-full object-cover border-4 border-white">
+                            </div>
+                            <a href="#" class="absolute bottom-0 right-0 bg-white text-brand-600 p-2 rounded-full shadow-md hover:scale-110 transition-transform border border-gray-100">
+                                <i class="fa-brands fa-linkedin text-lg"></i>
+                            </a>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mb-1 font-serif">Tan Chee Keat</h3>
+                        <p class="text-xs font-bold uppercase tracking-wider text-brand-600 mb-4">Project Lead</p>
+                        
+                        <p class="text-gray-500 text-sm leading-relaxed mb-6">
+                            Spearheading project delivery and seamless financial system architecture.
+                        </p>
+
+                        <!-- Skills Tags -->
+                        <div class="flex flex-wrap justify-center gap-2 mt-auto">
+                            <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium group-hover:bg-brand-100 group-hover:text-brand-700 transition-colors">Strategy</span>
+                            <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium group-hover:bg-brand-100 group-hover:text-brand-700 transition-colors">Finance</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Member 2: Lim Hong Zhang -->
+                <div class="group relative w-80 bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 overflow-hidden reveal-on-scroll stagger-1">
+                    <!-- Hover Gradient -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="relative z-10 flex flex-col items-center text-center">
+                        <div class="relative mb-6">
+                            <div class="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-gray-100 to-gray-200 group-hover:from-purple-400 group-hover:to-purple-600 transition-colors duration-500">
+                                <!-- UPDATED IMAGE SOURCE HERE -->
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=HongZhang" alt="Lim Hong Zhang" class="w-full h-full rounded-full object-cover border-4 border-white">
+                            </div>
+                            <a href="#" class="absolute bottom-0 right-0 bg-white text-purple-600 p-2 rounded-full shadow-md hover:scale-110 transition-transform border border-gray-100">
+                                <i class="fa-brands fa-github text-lg"></i>
+                            </a>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mb-1 font-serif">Lim Hong Zhang</h3>
+                        <p class="text-xs font-bold uppercase tracking-wider text-purple-600 mb-4">Tech Lead</p>
+                        
+                        <p class="text-gray-500 text-sm leading-relaxed mb-6">
+                            Architecting secure JamAI integrations and core AI logic engines.
+                        </p>
+
+                        <div class="flex flex-wrap justify-center gap-2 mt-auto">
+                            <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors">AI/ML</span>
+                            <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors">Security</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Member 3: Lim Sze Man -->
+                <div class="group relative w-80 bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 overflow-hidden reveal-on-scroll stagger-2">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                    <div class="relative z-10 flex flex-col items-center text-center">
+                        <div class="relative mb-6">
+                            <div class="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-gray-100 to-gray-200 group-hover:from-blue-400 group-hover:to-blue-600 transition-colors duration-500">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=SzeMan" alt="Lim Sze Man" class="w-full h-full rounded-full object-cover border-4 border-white">
+                            </div>
+                            <!-- CHANGED ICON: Chart Pie for Data Analyst -->
+                            <a href="#" class="absolute bottom-0 right-0 bg-white text-blue-600 p-2 rounded-full shadow-md hover:scale-110 transition-transform border border-gray-100">
+                                <i class="fa-solid fa-chart-pie text-lg"></i>
+                            </a>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mb-1 font-serif">Lim Sze Man</h3>
+                        <p class="text-xs font-bold uppercase tracking-wider text-blue-600 mb-4">Data Analyst</p>
+                        
+                        <p class="text-gray-500 text-sm leading-relaxed mb-6">
+                            Optimizing data patterns and invoice processing workflows.
+                        </p>
+                        <div class="flex flex-wrap justify-center gap-2 mt-auto">
+                            <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">Data</span>
+                            <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">OCR</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Member 4: Khor Kai Yee -->
+                <div class="group relative w-80 bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 overflow-hidden reveal-on-scroll stagger-1">
+                    <div class="absolute inset-0 bg-gradient-to-br from-yellow-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                    <div class="relative z-10 flex flex-col items-center text-center">
+                        <div class="relative mb-6">
+                            <div class="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-gray-100 to-gray-200 group-hover:from-yellow-400 group-hover:to-yellow-600 transition-colors duration-500">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=KaiYee" alt="Khor Kai Yee" class="w-full h-full rounded-full object-cover border-4 border-white">
+                            </div>
+                            <!-- CHANGED ICON: Clipboard Check for QA/Compliance -->
+                            <a href="#" class="absolute bottom-0 right-0 bg-white text-yellow-600 p-2 rounded-full shadow-md hover:scale-110 transition-transform border border-gray-100">
+                                <i class="fa-solid fa-clipboard-check text-lg"></i>
+                            </a>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mb-1 font-serif">Khor Kai Yee</h3>
+                        <p class="text-xs font-bold uppercase tracking-wider text-yellow-600 mb-4">QA & Compliance</p>
+                        
+                        <p class="text-gray-500 text-sm leading-relaxed mb-6">
+                            Ensuring strict adherence to LHDN standards and software quality.
+                        </p>
+
+                        <div class="flex flex-wrap justify-center gap-2 mt-auto">
+                            <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium group-hover:bg-yellow-100 group-hover:text-yellow-700 transition-colors">Testing</span>
+                            <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium group-hover:bg-yellow-100 group-hover:text-yellow-700 transition-colors">LHDN</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Member 5: Lee Ming Dao -->
+                <div class="group relative w-80 bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 overflow-hidden reveal-on-scroll stagger-2">
+                    <div class="absolute inset-0 bg-gradient-to-br from-pink-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="relative z-10 flex flex-col items-center text-center">
+                        <div class="relative mb-6">
+                            <div class="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-gray-100 to-gray-200 group-hover:from-pink-400 group-hover:to-pink-600 transition-colors duration-500">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=MingDao" alt="Lee Ming Dao" class="w-full h-full rounded-full object-cover border-4 border-white">
+                            </div>
+                            <!-- CHANGED ICON: Dribbble for UI/UX Design -->
+                            <a href="#" class="absolute bottom-0 right-0 bg-white text-pink-600 p-2 rounded-full shadow-md hover:scale-110 transition-transform border border-gray-100">
+                                <i class="fa-brands fa-dribbble text-lg"></i>
+                            </a>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mb-1 font-serif">Lee Ming Dao</h3>
+                        <p class="text-xs font-bold uppercase tracking-wider text-pink-600 mb-4">UI/UX Designer</p>
+                        
+                        <p class="text-gray-500 text-sm leading-relaxed mb-6">
+                            Crafting intuitive and beautiful user interfaces for seamless flow.
+                        </p>
+
+                        <div class="flex flex-wrap justify-center gap-2 mt-auto">
+                            <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium group-hover:bg-pink-100 group-hover:text-pink-700 transition-colors">Design</span>
+                            <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium group-hover:bg-pink-100 group-hover:text-pink-700 transition-colors">Frontend</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="py-24 bg-white">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-gray-900 text-center mb-12 reveal-on-scroll">Frequently Asked Questions</h2>
+            
+            <div class="space-y-4 reveal-on-scroll stagger-1">
+                <!-- FAQ Item 1 -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group">
+                    <button class="w-full px-6 py-4 text-left font-semibold text-gray-900 flex justify-between items-center focus:outline-none" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180');">
+                        Does EzBill work for walk-in customers without TIN?
+                        <i class="fa-solid fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
+                    </button>
+                    <div class="px-6 pb-4 text-gray-600 hidden">
+                        Yes! The system automatically assigns the General TIN (EI00000000010) for walk-in customers, ensuring you can submit the invoice without errors.
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group">
+                    <button class="w-full px-6 py-4 text-left font-semibold text-gray-900 flex justify-between items-center focus:outline-none" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180');">
+                        Can I integrate EzBill with my existing POS?
+                        <i class="fa-solid fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
+                    </button>
+                    <div class="px-6 pb-4 text-gray-600 hidden">
+                        Absolutely. We provide an API endpoint or a browser extension that sits on top of the MyInvois portal to autofill data directly.
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group">
+                    <button class="w-full px-6 py-4 text-left font-semibold text-gray-900 flex justify-between items-center focus:outline-none" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180');">
+                        Is my data safe with EzBill?
+                        <i class="fa-solid fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
+                    </button>
+                    <div class="px-6 pb-4 text-gray-600 hidden">
+                        We prioritize privacy. By building on JamAI Base, we can offer on-premise deployment options for businesses that need strict data sovereignty.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Infinite Marquee (Supported Platforms) -->
+    <div class="bg-gray-50 border-y border-gray-200 py-8 overflow-hidden relative">
+        <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-gray-50 to-transparent z-10"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-gray-50 to-transparent z-10"></div>
+        
+        <div class="flex items-center gap-16 animate-marquee whitespace-nowrap opacity-60 grayscale hover:grayscale-0 transition duration-500">
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-bag-shopping"></i> Shopee</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-utensils"></i> GrabFood</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-shop"></i> TikTok Shop</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-brands fa-shopify"></i> Shopify</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-store"></i> Kedai Runcit</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-cash-register"></i> POS Systems</span>
+            <!-- Duplicate for seamless loop -->
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-bag-shopping"></i> Shopee</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-utensils"></i> GrabFood</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-shop"></i> TikTok Shop</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-brands fa-shopify"></i> Shopify</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white pt-16 pb-8 border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Updated Grid to 4 columns since we removed 2 sections -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                
+                <!-- Brand Column (Spans 2 cols on large screens) -->
+                <div class="lg:col-span-2">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white font-bold">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </div>
+                        <span class="font-bold text-2xl tracking-tight text-gray-900">EzBill</span>
+                    </div>
+                    
+                    <!-- Social Icons -->
+                    <div class="flex gap-4 mb-8">
+                        <a href="#" class="text-gray-400 hover:text-black transition text-xl"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-black transition text-xl"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-black transition text-xl"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-black transition text-xl"><i class="fa-brands fa-facebook"></i></a>
+                    </div>
+
+                    <div class="text-gray-500 text-sm">
+                        <p class="mb-2 font-medium text-gray-900">Need help?</p>
+                        <a href="mailto:support@ezbill.com" class="text-gray-600 hover:text-black underline decoration-gray-300 hover:decoration-black transition">support@ezbill.com</a>
+                    </div>
+                </div>
+
+                <!-- Removed "EzBill" Link Group -->
+
+                <!-- Links Column 2 (Features) - Spans 2 cols on lg -->
+                <div class="lg:col-span-2">
+                    <h4 class="font-bold text-gray-900 mb-4">Features</h4>
+                    <!-- Changed grid for links to 2 columns within this block for better density if needed, or keep as list -->
+                    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-500">
+                        <li><a href="#" class="hover:text-brand-600 transition">Smart OCR Scanning</a></li>
+                        <li><a href="#" class="hover:text-brand-600 transition">RAG Validation Engine</a></li>
+                        <li><a href="#" class="hover:text-brand-600 transition">Auto Tax Coding</a></li>
+                        <li><a href="#" class="hover:text-brand-600 transition">MyInvois Integration</a></li>
+                        <li><a href="#" class="hover:text-brand-600 transition">Bulk Processing</a></li>
+                        <li>
+                            <a href="#" class="hover:text-brand-600 transition flex items-center gap-2">
+                                Mobile App <span class="bg-brand-100 text-brand-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Coming soon</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Removed "Tools" Link Group -->
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+                <div>
+                    &copy; 2025 EzBill. All rights reserved.
+                </div>
+                <div class="flex flex-wrap justify-center gap-6">
+                    <a href="#" class="hover:text-gray-600 transition">Terms of Service</a>
+                    <a href="#" class="hover:text-gray-600 transition">Privacy Policy</a>
+                    <a href="#" class="hover:text-gray-600 transition">Cookies Policy</a>
+                    <a href="#" class="hover:text-gray-600 transition">About Us</a>
+                    <a href="#" class="hover:text-gray-600 transition">Ethics</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll Reveal Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Existing Reveal Animation
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            });
+
+            document.querySelectorAll('.reveal-on-scroll').forEach((el) => {
+                observer.observe(el);
+            });
+            
+            setTimeout(() => {
+                const heroElements = document.querySelectorAll('.pt-32 .reveal-on-scroll');
+                heroElements.forEach(el => el.classList.add('is-visible'));
+            }, 100);
+
+            // --- SEQUENTIAL CARD SCROLL LOGIC (5 CARDS) ---
+            const section = document.getElementById('parallax-section');
+            const cards = [
+                { el: document.getElementById('p-card-1'), color: 'rgba(250, 204, 21, 0.5)' }, // Brand Green
+                { el: document.getElementById('p-card-2'), color: 'rgba(59, 130, 246, 0.5)' }, // Blue
+                { el: document.getElementById('p-card-3'), color: 'rgba(239, 68, 68, 0.5)' },  // Red
+                { el: document.getElementById('p-card-4'), color: 'rgba(168, 85, 247, 0.5)' }, // Purple
+                { el: document.getElementById('p-card-5'), color: 'rgba(16, 185, 129, 0.5)' }  // Green
+            ];
+
+            // Helper to map range
+            const mapRange = (value, inMin, inMax, outMin, outMax) => {
+                const clampedInput = Math.max(inMin, Math.min(inMax, value));
+                return ((clampedInput - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
+            };
+
+            window.addEventListener('scroll', () => {
+                if (!section) return;
+
+                const rect = section.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                const viewportWidth = window.innerWidth;
+                
+                const totalScrollableDistance = section.offsetHeight - viewportHeight;
+                const currentScroll = -rect.top;
+                
+                let progress = currentScroll / totalScrollableDistance;
+                progress = Math.max(0, Math.min(1, progress));
+
+                // UPDATED Animation Logic for Tighter Spacing & Clear Start
+                // Define overlapping time windows for each card
+                // Starts at 0.10 to allow text to be clear first
+                const cardWindows = [
+                    { start: 0.10, end: 0.28 }, // Overlaps next
+                    { start: 0.26, end: 0.44 }, // Overlaps prev & next
+                    { start: 0.42, end: 0.60 },
+                    { start: 0.58, end: 0.76 },
+                    { start: 0.74, end: 0.92 }
+                ];
+
+                cards.forEach((card, index) => {
+                    const window = cardWindows[index];
+                    
+                    // Normalized progress for this specific card (0 to 1 within its window)
+                    // Added slight padding (+0.1) to window for smoother transitions
+                    const windowDuration = (window.end + 0.1) - (window.start - 0.1);
+                    const effectiveProgress = (progress - (window.start - 0.1)) / windowDuration;
+                    
+                    // Translate Logic:
+                    // Move from Right (100vw + buffer) to Left (-100vw - buffer)
+                    // Start/End points pushed further out to ensure no card is visible at start/end of section
+                    const startX = viewportWidth * 1.2 + 400;
+                    const endX = -viewportWidth * 1.2 - 400;
+
+                    let xPos;
+                    // 40% Enter, 20% Pause in Center, 40% Exit
+                    if (effectiveProgress < 0.4) {
+                        // Entering
+                        xPos = mapRange(effectiveProgress, 0, 0.4, startX, 0);
+                    } else if (effectiveProgress > 0.6) {
+                        // Exiting
+                        xPos = mapRange(effectiveProgress, 0.6, 1, 0, endX);
+                    } else {
+                        // Center Hover (Slow movement for readability)
+                        xPos = mapRange(effectiveProgress, 0.4, 0.6, 0, 0); 
+                    }
+
+                    // Rotation Logic
+                    const rotation = mapRange(effectiveProgress, 0, 1, 15, -15);
+
+                    // Opacity Logic
+                    let opacity = 0;
+                    if (effectiveProgress > 0.1 && effectiveProgress < 0.9) {
+                        opacity = 1;
+                    } else {
+                        // Fade edges quickly
+                        const distToCenter = Math.abs(effectiveProgress - 0.5);
+                        opacity = 1 - ((distToCenter - 0.4) * 10); 
+                    }
+                    opacity = Math.max(0, Math.min(1, opacity));
+
+                    // SCALE & GLOW EFFECT (The "Spotlight")
+                    // When card is near center (progress ~0.5 relative to its window), scale up
+                    const isCentered = effectiveProgress > 0.4 && effectiveProgress < 0.6;
+                    const scale = isCentered ? 1.1 : 0.9;
+                    const boxShadow = isCentered 
+                        ? `0 25px 50px -12px ${card.color}, 0 0 0 4px ${card.color}` // Glow ring
+                        : '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
+
+                    // Initial state handling: force far off-screen if progress is 0
+                    if (progress <= 0.01) {
+                         card.el.style.transform = `translate(${startX}px, 0px)`;
+                         card.el.style.opacity = 0;
+                    } else {
+                        // Apply Styles
+                        card.el.style.transform = `translate(${xPos}px, 0px) rotate(${rotation}deg) scale(${scale})`;
+                        card.el.style.opacity = opacity;
+                        card.el.style.boxShadow = boxShadow;
+                        card.el.style.zIndex = isCentered ? 100 : 10; // Bring active card to front
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
