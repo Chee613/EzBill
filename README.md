@@ -10,9 +10,9 @@ You can also open it directly from your computer—no installation or server nee
 
 ### Steps to Open
 
-1. Download the **`EzBillPresentation_v1.1.html`** file
+1. Download the **`EzBillPresentation.html`** file
 2. Navigate to the project folder.  
-3. Locate the file named **`EzBillPresentation_v1.1.html`**.  
+3. Locate the file named **`EzBillPresentation.html`**.  
 4. **Double-click** the file to open it in your default web browser.  
 5. The presentation will load locally, allowing you to browse through all slides.
 
