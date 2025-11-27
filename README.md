@@ -2,6 +2,20 @@
 
 EzBill is an AI-powered tool designed to streamline e-invoicing compliance for Malaysian SMEs. It bridges the gap between physical receipts and the MyInvois standard using JamAI Base.
 
+## 📊 View the Presentation Slide
+
+EzBill includes a **presentation slide** stored as a local HTML file. Click to view  [presentation](https://chee613.github.io/myinvois-pitch/)
+
+You can also open it directly from your computer—no installation or server needed.
+
+### Steps to Open
+
+1. Download the **`EzBillPresentation_v1.1.html`** file
+2. Navigate to the project folder.  
+3. Locate the file named **`EzBillPresentation_v1.1.html`**.  
+4. **Double-click** the file to open it in your default web browser.  
+5. The presentation will load locally, allowing you to browse through all slides.
+
 ## 🚀 Setup Guide
 
 ### Step 1: Create a JamAI Base Account
