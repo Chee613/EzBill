@@ -24,14 +24,14 @@ EzBill is an AI-powered tool designed to streamline e-invoicing compliance for M
 3. Upload the `EzBill.parquet` file.
 4. When prompted, select **EZBill** as the project to import.
 5. When **EZBill** appears at the All Projects section, you are go to go.
-
+   
 ![JamAI Import Project Card](screenshots/step3-import.png)
-![JamAI Import Project Card](screenshots/step3-import2.png)
+![JamAI Import Project Card](screenshots/step3.1-import.png)
 
 ### Step 4: Retrieve Configuration IDs
 You need to record specific Table IDs and Keys to connect the frontend.
 
-**Generate API Token:**
+**A. Generate API Token:**
    * Click on your **Profile Icon** in the top right corner.
    * Select **"Account Settings"**.
    * Click on **"Create a Personal Access Token"**.
@@ -61,7 +61,7 @@ You need to record specific Table IDs and Keys to connect the frontend.
 2. **Process:** Click the **"Process Invoice"** button. The system will use JamAI Base to extract the data.
 3. **Verify:** Review the extracted details in the "Extracted Data" panel.
 4. **Copy/Submit:**
-   * You may click **"DOWNLOAD JSON"** to save the formatted data for your records.
+   * You may click **"DOWNLOAD JSON"** to download the formatted data for your records.
    * Click **"Submit to MyInvois API"** to finalize the process.
 
 ![Completed Invoice Processing](screenshots/step6-usage.png)
