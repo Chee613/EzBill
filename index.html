@@ -285,7 +285,7 @@
                 qty: "Qty",
                 price: "Price",
                 total: "Total Payable",
-                copyJson: "COPY JSON",
+                copyJson: "DOWNLOAD JSON",
                 submit: "SUBMIT TO MyInvois API",
                 configTitle: "System Config",
                 cancel: "Cancel",
@@ -296,7 +296,7 @@
                 neuralEngine: "Engaging JamAI Neural Engine...",
                 neuralComplete: "Neural analysis complete.",
                 compliancePassed: "Compliance Validation: PASSED.",
-                jsonCopied: "JSON Copied!",
+                jsonCopied: "JSON Downloaded!",
                 transmitting: "Transmitting to MyInvois Gateway...",
                 transmitSuccess: "Transmission Successful (Sandbox).",
                 submitted: "Submitted to LHDN!",
@@ -339,7 +339,7 @@
                 qty: "Ktt",
                 price: "Harga",
                 total: "Jumlah Perlu Dibayar",
-                copyJson: "SALIN JSON",
+                copyJson: "MUAT TURUN JSON",
                 submit: "HANTAR KEPADA MyInvois API",
                 configTitle: "Konfigurasi Sistem",
                 cancel: "Batal",
@@ -350,7 +350,7 @@
                 neuralEngine: "Menggunakan Enjin Neural JamAI...",
                 neuralComplete: "Analisis neural selesai.",
                 compliancePassed: "Pengesahan Pematuhan: LULUS.",
-                jsonCopied: "JSON Disalin!",
+                jsonCopied: "JSON Dimuat Turun!",
                 transmitting: "Menghantar ke Gerbang MyInvois...",
                 transmitSuccess: "Penghantaran Berjaya (Sandbox).",
                 submitted: "Dihantar ke LHDN!",
@@ -390,8 +390,6 @@
                         <div className="space-y-5 relative z-10">
                             <InputGroup label="JamAI Project ID" value={temp.projectId} onChange={(e) => setTemp({...temp, projectId: e.target.value})} placeholder="proj_..." isConfig={true} />
                             <InputGroup label="Personal Access Token" value={temp.apiKey} onChange={(e) => setTemp({...temp, apiKey: e.target.value})} placeholder="jamai_pat_..." type="password" isConfig={true} />
-                            <InputGroup label="Action Table ID (OCR)" value={temp.tableId} onChange={(e) => setTemp({...temp, tableId: e.target.value})} placeholder="Action Table ID" isConfig={true} />
-                            <InputGroup label="Chat Table ID (EzBill_Chat)" value={temp.chatTableId} onChange={(e) => setTemp({...temp, chatTableId: e.target.value})} placeholder="EzBill_Chat" isConfig={true} />
                         </div>
                         <div className="mt-8 flex justify-end gap-3 relative z-10">
                             <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition">{txt.cancel}</button>
@@ -760,8 +758,8 @@
             const [config, setConfig] = useState({
                 projectId: localStorage.getItem('JAMAI_PROJECT_ID') || '',
                 apiKey: localStorage.getItem('JAMAI_API_KEY') || '',
-                tableId: localStorage.getItem('JAMAI_TABLE_ID') || 'MyInvois',
-                chatTableId: localStorage.getItem('JAMAI_CHAT_ID') || 'EzBill_Chat'
+                tableId: 'MyInvois',
+                chatTableId: 'EzBill_Chat'
             });
             const [showConfig, setShowConfig] = useState(false);
             const [file, setFile] = useState(null);
@@ -786,9 +784,11 @@
             const saveConfig = (newConfig) => {
                 localStorage.setItem('JAMAI_PROJECT_ID', newConfig.projectId);
                 localStorage.setItem('JAMAI_API_KEY', newConfig.apiKey);
-                localStorage.setItem('JAMAI_TABLE_ID', newConfig.tableId);
-                localStorage.setItem('JAMAI_CHAT_ID', newConfig.chatTableId);
-                setConfig(newConfig);
+                setConfig({
+                    ...newConfig,
+                    tableId: 'MyInvois',
+                    chatTableId: 'EzBill_Chat'
+                });
             };
 
             const addLog = (msgKey, type = 'info') => {
@@ -991,13 +991,23 @@
                 }
             };
 
-            const handleCopyJSON = () => {
+            const handleDownloadJSON = () => {
                 // Prefer copying the raw, un-normalized result if available
                 const dataToCopy = rawResult || result;
                 if(!dataToCopy) return;
-                navigator.clipboard.writeText(JSON.stringify(dataToCopy, null, 2));
+
+                const jsonString = JSON.stringify(dataToCopy, null, 2);
+                const blob = new Blob([jsonString], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "EzBill_Extracted_Data.json";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
                 addLog("jsonCopied", 'success');
-                alert(txt.jsonCopied);
             };
 
             const handleSubmit = () => {
@@ -1217,8 +1227,8 @@
 
                                     {/* Footer Buttons - High Contrast */}
                                     <div className="bg-slate-50 dark:bg-white/5 p-6 border-t border-slate-200 dark:border-white/10 flex gap-4">
-                                        <button onClick={handleCopyJSON} disabled={!result} className="flex-1 py-3 border-2 border-slate-900 dark:border-brand-400 rounded font-mono text-sm font-bold flex justify-center gap-2 items-center text-slate-900 dark:text-brand-400 hover:bg-slate-200 dark:hover:bg-brand-400/10 transition disabled:opacity-40 disabled:cursor-not-allowed">
-                                            <Icon name="copy" className="w-4 h-4" /> {txt.copyJson}
+                                        <button onClick={handleDownloadJSON} disabled={!result} className="flex-1 py-3 border-2 border-slate-900 dark:border-brand-400 rounded font-mono text-sm font-bold flex justify-center gap-2 items-center text-slate-900 dark:text-brand-400 hover:bg-slate-200 dark:hover:bg-brand-400/10 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                                            <Icon name="download" className="w-4 h-4" /> {txt.copyJson}
                                         </button>
                                         {/* High Contrast Submit Button */}
                                         <button onClick={handleSubmit} disabled={!result} className="flex-1 py-3 bg-black dark:bg-gradient-to-r dark:from-purple-600 dark:to-bill-500 text-white dark:text-white rounded font-mono text-sm font-bold flex justify-center gap-2 items-center shadow-lg hover:shadow-xl hover:scale-[1.02] transition disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none">
