@@ -1,0 +1,1361 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EzBill | AI Autofill for MyInvois Compliance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Updated to just Inter for a clean, formal, professional look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        // Mapped serif to Inter as well to ensure all 'aesthetic' headers become formal/corporate
+                        serif: ['Inter', 'sans-serif'], 
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e', // Success Green
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        dark: '#111827',
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'marquee': 'marquee 25s linear infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        /* Transition Utilities */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+            will-change: opacity, transform;
+        }
+        
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stagger-1 { transition-delay: 100ms; }
+        .stagger-2 { transition-delay: 200ms; }
+        .stagger-3 { transition-delay: 300ms; }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0px}.-left-10{left:-2.5rem}.-left-2{left:-0.5rem}.-left-3{left:-0.75rem}.-right-2{right:-0.5rem}.-right-3{right:-0.75rem}.-top-2{top:-0.5rem}.-top-3{top:-0.75rem}.-top-4{top:-1rem}.bottom-0{bottom:0px}.bottom-4{bottom:1rem}.bottom-6{bottom:1.5rem}.left-0{left:0px}.left-1\/2{left:50%}.left-10{left:2.5rem}.left-3\.5{left:0.875rem}.left-6{left:1.5rem}.right-0{right:0px}.right-10{right:2.5rem}.right-6{right:1.5rem}.top-0{top:0px}.top-1{top:0.25rem}.top-1\/2{top:50%}.top-1\/4{top:25%}.top-12{top:3rem}.top-20{top:5rem}.top-4{top:1rem}.bottom-2{bottom:0.5rem}.left-3{left:0.75rem}.left-4{left:1rem}.top-0\.5{top:0.125rem}.top-2{top:0.5rem}.right-4{right:1rem}.z-50{z-index:50}.-z-10{z-index:-10}.z-0{z-index:0}.z-10{z-index:10}.z-20{z-index:20}.order-1{order:1}.order-2{order:2}.order-3{order:3}.col-span-1{grid-column:span 1 / span 1}.m-4{margin:1rem}.mx-auto{margin-left:auto;margin-right:auto}.-mr-4{margin-right:-1rem}.-mt-4{margin-top:-1rem}.mb-1{margin-bottom:0.25rem}.mb-10{margin-bottom:2.5rem}.mb-12{margin-bottom:3rem}.mb-16{margin-bottom:4rem}.mb-2{margin-bottom:0.5rem}.mb-20{margin-bottom:5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-1{margin-left:0.25rem}.mr-2{margin-right:0.5rem}.mt-0{margin-top:0px}.mt-1{margin-top:0.25rem}.mt-1\.5{margin-top:0.375rem}.mt-10{margin-top:2.5rem}.mt-12{margin-top:3rem}.mt-2{margin-top:0.5rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.mt-8{margin-top:2rem}.mt-auto{margin-top:auto}.mb-0\.5{margin-bottom:0.125rem}.mt-0\.5{margin-top:0.125rem}.mt-3{margin-top:0.75rem}.ml-2{margin-left:0.5rem}.mr-1{margin-right:0.25rem}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.aspect-video{aspect-ratio:16 / 9}.aspect-\[3\/4\]{aspect-ratio:3/4}.h-16{height:4rem}.h-8{height:2rem}.h-0\.5{height:0.125rem}.h-10{height:2.5rem}.h-12{height:3rem}.h-14{height:3.5rem}.h-2{height:0.5rem}.h-20{height:5rem}.h-24{height:6rem}.h-32{height:8rem}.h-6{height:1.5rem}.h-64{height:16rem}.h-7{height:1.75rem}.h-96{height:24rem}.h-\[400px\]{height:400px}.h-\[500px\]{height:500px}.h-\[500vh\]{height:500vh}.h-full{height:100%}.h-px{height:1px}.h-screen{height:100vh}.h-1{height:0.25rem}.h-48{height:12rem}.min-h-\[380px\]{min-height:380px}.min-h-screen{min-height:100vh}.w-8{width:2rem}.w-full{width:100%}.w-0\.5{width:0.125rem}.w-1{width:0.25rem}.w-1\.5{width:0.375rem}.w-1\/3{width:33.333333%}.w-10{width:2.5rem}.w-12{width:3rem}.w-14{width:3.5rem}.w-16{width:4rem}.w-2{width:0.5rem}.w-20{width:5rem}.w-24{width:6rem}.w-32{width:8rem}.w-6{width:1.5rem}.w-64{width:16rem}.w-7{width:1.75rem}.w-80{width:20rem}.w-96{width:24rem}.max-w-7xl{max-width:80rem}.max-w-2xl{max-width:42rem}.max-w-3xl{max-width:48rem}.max-w-4xl{max-width:56rem}.max-w-5xl{max-width:64rem}.max-w-6xl{max-width:72rem}.max-w-xs{max-width:20rem}.max-w-\[95\%\]{max-width:95%}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}.origin-center{transform-origin:center}.-translate-x-1\/2{--tw-translate-x:-50%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.translate-y-0{--tw-translate-y:0px;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.rotate-45{--tw-rotate:45deg;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.rotate-180{--tw-rotate:180deg;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes blob{0%{transform:translate(0px, 0px) scale(1)}33%{transform:translate(30px, -50px) scale(1.1)}66%{transform:translate(-20px, 20px) scale(0.9)}100%{transform:translate(0px, 0px) scale(1)}}.animate-blob{animation:blob 7s infinite}@keyframes bounce{0%, 100%{transform:translateY(-25%);animation-timing-function:cubic-bezier(0.8,0,1,1)}50%{transform:none;animation-timing-function:cubic-bezier(0,0,0.2,1)}}.animate-bounce{animation:bounce 1s infinite}@keyframes marquee{0%{transform:translateX(0%)}100%{transform:translateX(-100%)}}.animate-marquee{animation:marquee 25s linear infinite}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.animate-\[scan_3s_linear_infinite\]{animation:scan 3s linear infinite}.cursor-pointer{cursor:pointer}.cursor-default{cursor:default}.cursor-help{cursor:help}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.items-stretch{align-items:stretch}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.gap-1{gap:0.25rem}.gap-12{gap:3rem}.gap-16{gap:4rem}.gap-20{gap:5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}.gap-6{gap:1.5rem}.gap-8{gap:2rem}.gap-0{gap:0px}.space-x-8 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(2rem * var(--tw-space-x-reverse));margin-left:calc(2rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.space-y-8 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(2rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(2rem * var(--tw-space-y-reverse))}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.divide-y > :not([hidden]) ~ :not([hidden]){--tw-divide-y-reverse:0;border-top-width:calc(1px * calc(1 - var(--tw-divide-y-reverse)));border-bottom-width:calc(1px * var(--tw-divide-y-reverse))}.divide-gray-800 > :not([hidden]) ~ :not([hidden]){--tw-divide-opacity:1;border-color:rgb(31 41 55 / var(--tw-divide-opacity, 1))}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.overflow-x-hidden{overflow-x:hidden}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.whitespace-nowrap{white-space:nowrap}.rounded-lg{border-radius:0.5rem}.rounded{border-radius:0.25rem}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-full{border-radius:9999px}.rounded-xl{border-radius:0.75rem}.rounded-bl-full{border-bottom-left-radius:9999px}.rounded-br-2xl{border-bottom-right-radius:1rem}.rounded-br-xl{border-bottom-right-radius:0.75rem}.border{border-width:1px}.border-2{border-width:2px}.border-4{border-width:4px}.border-y{border-top-width:1px;border-bottom-width:1px}.border-b{border-bottom-width:1px}.border-b-2{border-bottom-width:2px}.border-l-4{border-left-width:4px}.border-l-\[12px\]{border-left-width:12px}.border-r{border-right-width:1px}.border-t{border-top-width:1px}.border-dashed{border-style:dashed}.border-gray-100{--tw-border-opacity:1;border-color:rgb(243 244 246 / var(--tw-border-opacity, 1))}.border-blue-100{--tw-border-opacity:1;border-color:rgb(219 234 254 / var(--tw-border-opacity, 1))}.border-blue-800{--tw-border-opacity:1;border-color:rgb(30 64 175 / var(--tw-border-opacity, 1))}.border-brand-100{--tw-border-opacity:1;border-color:rgb(220 252 231 / var(--tw-border-opacity, 1))}.border-brand-200{--tw-border-opacity:1;border-color:rgb(187 247 208 / var(--tw-border-opacity, 1))}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.border-gray-50{--tw-border-opacity:1;border-color:rgb(249 250 251 / var(--tw-border-opacity, 1))}.border-gray-900{--tw-border-opacity:1;border-color:rgb(17 24 39 / var(--tw-border-opacity, 1))}.border-green-100{--tw-border-opacity:1;border-color:rgb(220 252 231 / var(--tw-border-opacity, 1))}.border-green-50{--tw-border-opacity:1;border-color:rgb(240 253 244 / var(--tw-border-opacity, 1))}.border-orange-100{--tw-border-opacity:1;border-color:rgb(255 237 213 / var(--tw-border-opacity, 1))}.border-purple-100{--tw-border-opacity:1;border-color:rgb(243 232 255 / var(--tw-border-opacity, 1))}.border-red-100{--tw-border-opacity:1;border-color:rgb(254 226 226 / var(--tw-border-opacity, 1))}.border-slate-600{--tw-border-opacity:1;border-color:rgb(71 85 105 / var(--tw-border-opacity, 1))}.border-slate-700{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.border-white{--tw-border-opacity:1;border-color:rgb(255 255 255 / var(--tw-border-opacity, 1))}.border-blue-200{--tw-border-opacity:1;border-color:rgb(191 219 254 / var(--tw-border-opacity, 1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-slate-300{--tw-border-opacity:1;border-color:rgb(203 213 225 / var(--tw-border-opacity, 1))}.border-slate-400{--tw-border-opacity:1;border-color:rgb(148 163 184 / var(--tw-border-opacity, 1))}.border-gray-400{--tw-border-opacity:1;border-color:rgb(156 163 175 / var(--tw-border-opacity, 1))}.border-green-200{--tw-border-opacity:1;border-color:rgb(187 247 208 / var(--tw-border-opacity, 1))}.border-red-200{--tw-border-opacity:1;border-color:rgb(254 202 202 / var(--tw-border-opacity, 1))}.border-blue-500\/30{border-color:rgb(59 130 246 / 0.3)}.border-gray-700{--tw-border-opacity:1;border-color:rgb(55 65 81 / var(--tw-border-opacity, 1))}.border-gray-800{--tw-border-opacity:1;border-color:rgb(31 41 55 / var(--tw-border-opacity, 1))}.border-green-500\/30{border-color:rgb(34 197 94 / 0.3)}.border-green-500\/50{border-color:rgb(34 197 94 / 0.5)}.border-l-blue-500{--tw-border-opacity:1;border-left-color:rgb(59 130 246 / var(--tw-border-opacity, 1))}.border-l-orange-500{--tw-border-opacity:1;border-left-color:rgb(249 115 22 / var(--tw-border-opacity, 1))}.border-l-purple-500{--tw-border-opacity:1;border-left-color:rgb(168 85 247 / var(--tw-border-opacity, 1))}.border-l-red-500{--tw-border-opacity:1;border-left-color:rgb(239 68 68 / var(--tw-border-opacity, 1))}.border-l-blue-600{--tw-border-opacity:1;border-left-color:rgb(37 99 235 / var(--tw-border-opacity, 1))}.bg-brand-500{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/80{background-color:rgb(255 255 255 / 0.8)}.bg-\[\#22c55e\]{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.bg-\[\#f0fdf4\]{--tw-bg-opacity:1;background-color:rgb(240 253 244 / var(--tw-bg-opacity, 1))}.bg-black{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity, 1))}.bg-blue-100{--tw-bg-opacity:1;background-color:rgb(219 234 254 / var(--tw-bg-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-blue-500\/20{background-color:rgb(59 130 246 / 0.2)}.bg-blue-900\/50{background-color:rgb(30 58 138 / 0.5)}.bg-brand-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.bg-brand-200{--tw-bg-opacity:1;background-color:rgb(187 247 208 / var(--tw-bg-opacity, 1))}.bg-brand-50{--tw-bg-opacity:1;background-color:rgb(240 253 244 / var(--tw-bg-opacity, 1))}.bg-brand-50\/50{background-color:rgb(240 253 244 / 0.5)}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.bg-gray-50{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.bg-gray-50\/50{background-color:rgb(249 250 251 / 0.5)}.bg-gray-500{--tw-bg-opacity:1;background-color:rgb(107 114 128 / var(--tw-bg-opacity, 1))}.bg-gray-800{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity, 1))}.bg-gray-900{--tw-bg-opacity:1;background-color:rgb(17 24 39 / var(--tw-bg-opacity, 1))}.bg-green-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.bg-green-50{--tw-bg-opacity:1;background-color:rgb(240 253 244 / var(--tw-bg-opacity, 1))}.bg-green-500{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.bg-indigo-50{--tw-bg-opacity:1;background-color:rgb(238 242 255 / var(--tw-bg-opacity, 1))}.bg-orange-50{--tw-bg-opacity:1;background-color:rgb(255 247 237 / var(--tw-bg-opacity, 1))}.bg-purple-100{--tw-bg-opacity:1;background-color:rgb(243 232 255 / var(--tw-bg-opacity, 1))}.bg-purple-200{--tw-bg-opacity:1;background-color:rgb(233 213 255 / var(--tw-bg-opacity, 1))}.bg-purple-50{--tw-bg-opacity:1;background-color:rgb(250 245 255 / var(--tw-bg-opacity, 1))}.bg-purple-500\/20{background-color:rgb(168 85 247 / 0.2)}.bg-red-100{--tw-bg-opacity:1;background-color:rgb(254 226 226 / var(--tw-bg-opacity, 1))}.bg-red-50{--tw-bg-opacity:1;background-color:rgb(254 242 242 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-slate-700{--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.bg-slate-800{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.bg-slate-800\/50{background-color:rgb(30 41 59 / 0.5)}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-slate-900\/80{background-color:rgb(15 23 42 / 0.8)}.bg-teal-50{--tw-bg-opacity:1;background-color:rgb(240 253 250 / var(--tw-bg-opacity, 1))}.bg-white\/20{background-color:rgb(255 255 255 / 0.2)}.bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.bg-slate-300{--tw-bg-opacity:1;background-color:rgb(203 213 225 / var(--tw-bg-opacity, 1))}.bg-gray-600{--tw-bg-opacity:1;background-color:rgb(75 85 99 / var(--tw-bg-opacity, 1))}.bg-indigo-700{--tw-bg-opacity:1;background-color:rgb(67 56 202 / var(--tw-bg-opacity, 1))}.bg-slate-400{--tw-bg-opacity:1;background-color:rgb(148 163 184 / var(--tw-bg-opacity, 1))}.bg-\[\#050b14\]{--tw-bg-opacity:1;background-color:rgb(5 11 20 / var(--tw-bg-opacity, 1))}.bg-\[\#0a101f\]{--tw-bg-opacity:1;background-color:rgb(10 16 31 / var(--tw-bg-opacity, 1))}.bg-\[\#0f172a\]{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-blue-900\/10{background-color:rgb(30 58 138 / 0.1)}.bg-gray-900\/50{background-color:rgb(17 24 39 / 0.5)}.bg-green-900\/30{background-color:rgb(20 83 45 / 0.3)}.bg-purple-600{--tw-bg-opacity:1;background-color:rgb(147 51 234 / var(--tw-bg-opacity, 1))}.bg-orange-100{--tw-bg-opacity:1;background-color:rgb(255 237 213 / var(--tw-bg-opacity, 1))}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.bg-gradient-to-l{background-image:linear-gradient(to left, var(--tw-gradient-stops))}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.bg-gradient-to-tr{background-image:linear-gradient(to top right, var(--tw-gradient-stops))}.from-\[\#10b981\]{--tw-gradient-from:#10b981 var(--tw-gradient-from-position);--tw-gradient-to:rgb(16 185 129 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-blue-50{--tw-gradient-from:#eff6ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(239 246 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-brand-50{--tw-gradient-from:#f0fdf4 var(--tw-gradient-from-position);--tw-gradient-to:rgb(240 253 244 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-gray-100{--tw-gradient-from:#f3f4f6 var(--tw-gradient-from-position);--tw-gradient-to:rgb(243 244 246 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-gray-50{--tw-gradient-from:#f9fafb var(--tw-gradient-from-position);--tw-gradient-to:rgb(249 250 251 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-pink-50{--tw-gradient-from:#fdf2f8 var(--tw-gradient-from-position);--tw-gradient-to:rgb(253 242 248 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-purple-50{--tw-gradient-from:#faf5ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(250 245 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-transparent{--tw-gradient-from:transparent var(--tw-gradient-from-position);--tw-gradient-to:rgb(0 0 0 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-yellow-50{--tw-gradient-from:#fefce8 var(--tw-gradient-from-position);--tw-gradient-to:rgb(254 252 232 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-blue-600{--tw-gradient-from:#2563eb var(--tw-gradient-from-position);--tw-gradient-to:rgb(37 99 235 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.via-gray-200{--tw-gradient-to:rgb(229 231 235 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #e5e7eb var(--tw-gradient-via-position), var(--tw-gradient-to)}.to-\[\#059669\]{--tw-gradient-to:#059669 var(--tw-gradient-to-position)}.to-gray-200{--tw-gradient-to:#e5e7eb var(--tw-gradient-to-position)}.to-transparent{--tw-gradient-to:transparent var(--tw-gradient-to-position)}.to-cyan-500{--tw-gradient-to:#06b6d4 var(--tw-gradient-to-position)}.bg-clip-text{-webkit-background-clip:text;background-clip:text}.object-cover{object-fit:cover}.p-0{padding:0px}.p-0\.5{padding:0.125rem}.p-1{padding:0.25rem}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.p-5{padding:1.25rem}.p-2\.5{padding:0.625rem}.px-4{padding-left:1rem;padding-right:1rem}.px-1\.5{padding-left:0.375rem;padding-right:0.375rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-20{padding-top:5rem;padding-bottom:5rem}.py-24{padding-top:6rem;padding-bottom:6rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-8{padding-top:2rem;padding-bottom:2rem}.px-1{padding-left:0.25rem;padding-right:0.25rem}.py-0{padding-top:0px;padding-bottom:0px}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.px-7{padding-left:1.75rem;padding-right:1.75rem}.pb-20{padding-bottom:5rem}.pb-4{padding-bottom:1rem}.pb-8{padding-bottom:2rem}.pl-0{padding-left:0px}.pl-10{padding-left:2.5rem}.pr-0{padding-right:0px}.pt-16{padding-top:4rem}.pt-32{padding-top:8rem}.pt-4{padding-top:1rem}.pt-6{padding-top:1.5rem}.pt-8{padding-top:2rem}.pb-2{padding-bottom:0.5rem}.pl-8{padding-left:2rem}.pl-4{padding-left:1rem}.pl-9{padding-left:2.25rem}.pt-2{padding-top:0.5rem}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.font-sans{font-family:Inter, sans-serif}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.font-serif{font-family:Inter, sans-serif}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-5xl{font-size:3rem;line-height:1}.text-6xl{font-size:3.75rem;line-height:1}.text-\[10px\]{font-size:10px}.text-\[13vw\]{font-size:13vw}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xs{font-size:0.75rem;line-height:1rem}.text-\[16px\]{font-size:16px}.font-bold{font-weight:700}.font-black{font-weight:900}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.italic{font-style:italic}.leading-\[0\.8\]{line-height:0.8}.leading-\[1\.1\]{line-height:1.1}.leading-relaxed{line-height:1.625}.leading-tight{line-height:1.25}.leading-none{line-height:1}.tracking-tight{letter-spacing:-0.025em}.tracking-tighter{letter-spacing:-0.05em}.tracking-wide{letter-spacing:0.025em}.tracking-wider{letter-spacing:0.05em}.tracking-widest{letter-spacing:0.1em}.text-brand-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-gray-900{--tw-text-opacity:1;color:rgb(17 24 39 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-\[\#15803d\]{--tw-text-opacity:1;color:rgb(21 128 61 / var(--tw-text-opacity, 1))}.text-blue-300{--tw-text-opacity:1;color:rgb(147 197 253 / var(--tw-text-opacity, 1))}.text-blue-400{--tw-text-opacity:1;color:rgb(96 165 250 / var(--tw-text-opacity, 1))}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-700\/80{color:rgb(29 78 216 / 0.8)}.text-blue-800{--tw-text-opacity:1;color:rgb(30 64 175 / var(--tw-text-opacity, 1))}.text-brand-500{--tw-text-opacity:1;color:rgb(34 197 94 / var(--tw-text-opacity, 1))}.text-brand-700{--tw-text-opacity:1;color:rgb(21 128 61 / var(--tw-text-opacity, 1))}.text-brand-800{--tw-text-opacity:1;color:rgb(22 101 52 / var(--tw-text-opacity, 1))}.text-brand-900{--tw-text-opacity:1;color:rgb(20 83 45 / var(--tw-text-opacity, 1))}.text-gray-300{--tw-text-opacity:1;color:rgb(209 213 219 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-green-400{--tw-text-opacity:1;color:rgb(74 222 128 / var(--tw-text-opacity, 1))}.text-green-500{--tw-text-opacity:1;color:rgb(34 197 94 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-green-700{--tw-text-opacity:1;color:rgb(21 128 61 / var(--tw-text-opacity, 1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.text-orange-600{--tw-text-opacity:1;color:rgb(234 88 12 / var(--tw-text-opacity, 1))}.text-orange-700\/80{color:rgb(194 65 12 / 0.8)}.text-orange-800{--tw-text-opacity:1;color:rgb(154 52 18 / var(--tw-text-opacity, 1))}.text-pink-600{--tw-text-opacity:1;color:rgb(219 39 119 / var(--tw-text-opacity, 1))}.text-purple-100{--tw-text-opacity:1;color:rgb(243 232 255 / var(--tw-text-opacity, 1))}.text-purple-300{--tw-text-opacity:1;color:rgb(216 180 254 / var(--tw-text-opacity, 1))}.text-purple-400{--tw-text-opacity:1;color:rgb(192 132 252 / var(--tw-text-opacity, 1))}.text-purple-600{--tw-text-opacity:1;color:rgb(147 51 234 / var(--tw-text-opacity, 1))}.text-red-100{--tw-text-opacity:1;color:rgb(254 226 226 / var(--tw-text-opacity, 1))}.text-red-500{--tw-text-opacity:1;color:rgb(239 68 68 / var(--tw-text-opacity, 1))}.text-red-600{--tw-text-opacity:1;color:rgb(220 38 38 / var(--tw-text-opacity, 1))}.text-red-700{--tw-text-opacity:1;color:rgb(185 28 28 / var(--tw-text-opacity, 1))}.text-red-700\/80{color:rgb(185 28 28 / 0.8)}.text-red-800{--tw-text-opacity:1;color:rgb(153 27 27 / var(--tw-text-opacity, 1))}.text-slate-200{--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.text-slate-300{--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-teal-600{--tw-text-opacity:1;color:rgb(13 148 136 / var(--tw-text-opacity, 1))}.text-transparent{color:transparent}.text-yellow-400{--tw-text-opacity:1;color:rgb(250 204 21 / var(--tw-text-opacity, 1))}.text-yellow-600{--tw-text-opacity:1;color:rgb(202 138 4 / var(--tw-text-opacity, 1))}.text-amber-600{--tw-text-opacity:1;color:rgb(217 119 6 / var(--tw-text-opacity, 1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.text-amber-700{--tw-text-opacity:1;color:rgb(180 83 9 / var(--tw-text-opacity, 1))}.text-green-800{--tw-text-opacity:1;color:rgb(22 101 52 / var(--tw-text-opacity, 1))}.text-purple-700{--tw-text-opacity:1;color:rgb(126 34 206 / var(--tw-text-opacity, 1))}.text-green-900{--tw-text-opacity:1;color:rgb(20 83 45 / var(--tw-text-opacity, 1))}.text-red-900{--tw-text-opacity:1;color:rgb(127 29 29 / var(--tw-text-opacity, 1))}.text-black{--tw-text-opacity:1;color:rgb(0 0 0 / var(--tw-text-opacity, 1))}.text-cyan-400{--tw-text-opacity:1;color:rgb(34 211 238 / var(--tw-text-opacity, 1))}.text-red-400{--tw-text-opacity:1;color:rgb(248 113 113 / var(--tw-text-opacity, 1))}.underline{-webkit-text-decoration-line:underline;text-decoration-line:underline}.decoration-gray-300{-webkit-text-decoration-color:#d1d5db;text-decoration-color:#d1d5db}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.opacity-0{opacity:0}.opacity-20{opacity:0.2}.opacity-30{opacity:0.3}.opacity-50{opacity:0.5}.opacity-60{opacity:0.6}.opacity-80{opacity:0.8}.opacity-90{opacity:0.9}.opacity-100{opacity:1}.opacity-40{opacity:0.4}.mix-blend-multiply{mix-blend-mode:multiply}.mix-blend-overlay{mix-blend-mode:overlay}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-\[0_0_15px_rgba\(34\2c 197\2c 94\2c 0\.8\)\]{--tw-shadow:0 0 15px rgba(34,197,94,0.8);--tw-shadow-colored:0 0 15px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-brand-200{--tw-shadow-color:#bbf7d0;--tw-shadow:var(--tw-shadow-colored)}.shadow-brand-500\/20{--tw-shadow-color:rgb(34 197 94 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.shadow-gray-100\/50{--tw-shadow-color:rgb(243 244 246 / 0.5);--tw-shadow:var(--tw-shadow-colored)}.shadow-green-200{--tw-shadow-color:#bbf7d0;--tw-shadow:var(--tw-shadow-colored)}.shadow-blue-500\/20{--tw-shadow-color:rgb(59 130 246 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.shadow-green-500\/40{--tw-shadow-color:rgb(34 197 94 / 0.4);--tw-shadow:var(--tw-shadow-colored)}.shadow-purple-500\/20{--tw-shadow-color:rgb(168 85 247 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.ring-4{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(4px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.ring-white{--tw-ring-opacity:1;--tw-ring-color:rgb(255 255 255 / var(--tw-ring-opacity, 1))}.blur-3xl{--tw-blur:blur(64px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.grayscale{--tw-grayscale:grayscale(100%);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-opacity{transition-property:opacity;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-shadow{transition-property:box-shadow;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-transform{transition-property:transform;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.duration-500{transition-duration:500ms}.will-change-transform{will-change:transform}.hover\:-translate-y-0\.5:hover{--tw-translate-y:-0.125rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:-translate-y-1:hover{--tw-translate-y:-0.25rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:-translate-y-2:hover{--tw-translate-y:-0.5rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:scale-110:hover{--tw-scale-x:1.1;--tw-scale-y:1.1;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:scale-\[1\.01\]:hover{--tw-scale-x:1.01;--tw-scale-y:1.01;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:scale-\[1\.02\]:hover{--tw-scale-x:1.02;--tw-scale-y:1.02;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:border-brand-300:hover{--tw-border-opacity:1;border-color:rgb(134 239 172 / var(--tw-border-opacity, 1))}.hover\:border-red-200:hover{--tw-border-opacity:1;border-color:rgb(254 202 202 / var(--tw-border-opacity, 1))}.hover\:border-green-500\/50:hover{border-color:rgb(34 197 94 / 0.5)}.hover\:bg-brand-50:hover{--tw-bg-opacity:1;background-color:rgb(240 253 244 / var(--tw-bg-opacity, 1))}.hover\:bg-brand-600:hover{--tw-bg-opacity:1;background-color:rgb(22 163 74 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-800:hover{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity, 1))}.hover\:bg-green-100:hover{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-800:hover{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-100:hover{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.hover\:bg-green-400:hover{--tw-bg-opacity:1;background-color:rgb(74 222 128 / var(--tw-bg-opacity, 1))}.hover\:bg-green-500\/10:hover{background-color:rgb(34 197 94 / 0.1)}.hover\:bg-purple-500:hover{--tw-bg-opacity:1;background-color:rgb(168 85 247 / var(--tw-bg-opacity, 1))}.hover\:from-blue-500:hover{--tw-gradient-from:#3b82f6 var(--tw-gradient-from-position);--tw-gradient-to:rgb(59 130 246 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:to-cyan-400:hover{--tw-gradient-to:#22d3ee var(--tw-gradient-to-position)}.hover\:text-black:hover{--tw-text-opacity:1;color:rgb(0 0 0 / var(--tw-text-opacity, 1))}.hover\:text-brand-600:hover{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.hover\:text-gray-600:hover{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.hover\:text-purple-800:hover{--tw-text-opacity:1;color:rgb(107 33 168 / var(--tw-text-opacity, 1))}.hover\:text-red-800:hover{--tw-text-opacity:1;color:rgb(153 27 27 / var(--tw-text-opacity, 1))}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.hover\:underline:hover{-webkit-text-decoration-line:underline;text-decoration-line:underline}.hover\:decoration-black:hover{-webkit-text-decoration-color:#000;text-decoration-color:#000}.hover\:opacity-100:hover{opacity:1}.hover\:opacity-80:hover{opacity:0.8}.hover\:shadow-2xl:hover{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.hover\:shadow-md:hover{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.hover\:shadow-xl:hover{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.hover\:grayscale-0:hover{--tw-grayscale:grayscale(0);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.active\:scale-95:active{--tw-scale-x:.95;--tw-scale-y:.95;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.group:hover .group-hover\:rotate-12{--tw-rotate:12deg;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.group:hover .group-hover\:scale-110{--tw-scale-x:1.1;--tw-scale-y:1.1;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.group:hover .group-hover\:border-brand-300{--tw-border-opacity:1;border-color:rgb(134 239 172 / var(--tw-border-opacity, 1))}.group:hover .group-hover\:bg-blue-100{--tw-bg-opacity:1;background-color:rgb(219 234 254 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:bg-brand-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:bg-brand-600{--tw-bg-opacity:1;background-color:rgb(22 163 74 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:bg-gray-700{--tw-bg-opacity:1;background-color:rgb(55 65 81 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:bg-pink-100{--tw-bg-opacity:1;background-color:rgb(252 231 243 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:bg-purple-100{--tw-bg-opacity:1;background-color:rgb(243 232 255 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:bg-red-500{--tw-bg-opacity:1;background-color:rgb(239 68 68 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:bg-yellow-100{--tw-bg-opacity:1;background-color:rgb(254 249 195 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:from-blue-400{--tw-gradient-from:#60a5fa var(--tw-gradient-from-position);--tw-gradient-to:rgb(96 165 250 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.group:hover .group-hover\:from-brand-400{--tw-gradient-from:#4ade80 var(--tw-gradient-from-position);--tw-gradient-to:rgb(74 222 128 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.group:hover .group-hover\:from-pink-400{--tw-gradient-from:#f472b6 var(--tw-gradient-from-position);--tw-gradient-to:rgb(244 114 182 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.group:hover .group-hover\:from-purple-400{--tw-gradient-from:#c084fc var(--tw-gradient-from-position);--tw-gradient-to:rgb(192 132 252 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.group:hover .group-hover\:from-yellow-400{--tw-gradient-from:#facc15 var(--tw-gradient-from-position);--tw-gradient-to:rgb(250 204 21 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.group:hover .group-hover\:to-blue-600{--tw-gradient-to:#2563eb var(--tw-gradient-to-position)}.group:hover .group-hover\:to-brand-600{--tw-gradient-to:#16a34a var(--tw-gradient-to-position)}.group:hover .group-hover\:to-pink-600{--tw-gradient-to:#db2777 var(--tw-gradient-to-position)}.group:hover .group-hover\:to-purple-600{--tw-gradient-to:#9333ea var(--tw-gradient-to-position)}.group:hover .group-hover\:to-yellow-600{--tw-gradient-to:#ca8a04 var(--tw-gradient-to-position)}.group:hover .group-hover\:text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:text-brand-700{--tw-text-opacity:1;color:rgb(21 128 61 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:text-pink-700{--tw-text-opacity:1;color:rgb(190 24 93 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:text-purple-700{--tw-text-opacity:1;color:rgb(126 34 206 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:text-yellow-700{--tw-text-opacity:1;color:rgb(161 98 7 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:text-green-400{--tw-text-opacity:1;color:rgb(74 222 128 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:opacity-10{opacity:0.1}.group:hover .group-hover\:opacity-100{opacity:1}@media (min-width: 640px){.sm\:block{display:block}.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:pb-24{padding-bottom:6rem}.sm\:pt-44{padding-top:11rem}.sm\:text-2xl{font-size:1.5rem;line-height:2rem}.sm\:text-5xl{font-size:3rem;line-height:1}.sm\:text-\[5\.5rem\]{font-size:5.5rem}}@media (min-width: 768px){.md\:order-1{order:1}.md\:order-2{order:2}.md\:order-3{order:3}.md\:mb-0{margin-bottom:0px}.md\:block{display:block}.md\:flex{display:flex}.md\:w-1\/4{width:25%}.md\:w-5\/12{width:41.666667%}.md\:w-96{width:24rem}.md\:w-\[45\%\]{width:45%}.md\:scale-105{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.md\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}.md\:items-center{align-items:center}.md\:justify-between{justify-content:space-between}.md\:gap-4{gap:1rem}.md\:pl-10{padding-left:2.5rem}.md\:pr-10{padding-right:2.5rem}}@media (min-width: 1024px){.lg\:col-span-1{grid-column:span 1 / span 1}.lg\:col-span-2{grid-column:span 2 / span 2}.lg\:col-span-5{grid-column:span 5 / span 5}.lg\:col-span-7{grid-column:span 7 / span 7}.lg\:flex{display:flex}.lg\:w-1\/4{width:25%}.lg\:w-2\/3{width:66.666667%}.lg\:w-\[30\%\]{width:30%}.lg\:w-\[22\%\]{width:22%}.lg\:w-\[70\%\]{width:70%}.lg\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.lg\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.lg\:grid-cols-12{grid-template-columns:repeat(12, minmax(0, 1fr))}.lg\:flex-row{flex-direction:row}.lg\:px-8{padding-left:2rem;padding-right:2rem}}</style><style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0px}.-left-10{left:-2.5rem}.-left-2{left:-0.5rem}.-left-3{left:-0.75rem}.-right-2{right:-0.5rem}.-right-3{right:-0.75rem}.-top-2{top:-0.5rem}.-top-3{top:-0.75rem}.-top-4{top:-1rem}.bottom-0{bottom:0px}.bottom-4{bottom:1rem}.bottom-6{bottom:1.5rem}.left-0{left:0px}.left-1\/2{left:50%}.left-10{left:2.5rem}.left-3\.5{left:0.875rem}.left-6{left:1.5rem}.right-0{right:0px}.right-10{right:2.5rem}.right-4{right:1rem}.right-6{right:1.5rem}.top-0{top:0px}.top-1{top:0.25rem}.top-1\/2{top:50%}.top-1\/4{top:25%}.top-12{top:3rem}.top-20{top:5rem}.top-4{top:1rem}.-z-10{z-index:-10}.z-0{z-index:0}.z-10{z-index:10}.z-20{z-index:20}.z-50{z-index:50}.order-1{order:1}.order-2{order:2}.order-3{order:3}.col-span-1{grid-column:span 1 / span 1}.mx-auto{margin-left:auto;margin-right:auto}.-mr-4{margin-right:-1rem}.-mt-4{margin-top:-1rem}.mb-1{margin-bottom:0.25rem}.mb-10{margin-bottom:2.5rem}.mb-12{margin-bottom:3rem}.mb-16{margin-bottom:4rem}.mb-2{margin-bottom:0.5rem}.mb-20{margin-bottom:5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-1{margin-left:0.25rem}.ml-2{margin-left:0.5rem}.mr-1{margin-right:0.25rem}.mr-2{margin-right:0.5rem}.mt-0{margin-top:0px}.mt-1{margin-top:0.25rem}.mt-1\.5{margin-top:0.375rem}.mt-12{margin-top:3rem}.mt-2{margin-top:0.5rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.mt-8{margin-top:2rem}.mt-auto{margin-top:auto}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.aspect-\[3\/4\]{aspect-ratio:3/4}.aspect-video{aspect-ratio:16 / 9}.h-0\.5{height:0.125rem}.h-1{height:0.25rem}.h-10{height:2.5rem}.h-12{height:3rem}.h-14{height:3.5rem}.h-16{height:4rem}.h-2{height:0.5rem}.h-20{height:5rem}.h-24{height:6rem}.h-32{height:8rem}.h-48{height:12rem}.h-6{height:1.5rem}.h-64{height:16rem}.h-8{height:2rem}.h-96{height:24rem}.h-\[500px\]{height:500px}.h-\[500vh\]{height:500vh}.h-full{height:100%}.h-px{height:1px}.h-screen{height:100vh}.min-h-\[380px\]{min-height:380px}.w-0\.5{width:0.125rem}.w-1{width:0.25rem}.w-1\.5{width:0.375rem}.w-1\/3{width:33.333333%}.w-10{width:2.5rem}.w-12{width:3rem}.w-14{width:3.5rem}.w-16{width:4rem}.w-2{width:0.5rem}.w-20{width:5rem}.w-24{width:6rem}.w-32{width:8rem}.w-6{width:1.5rem}.w-64{width:16rem}.w-8{width:2rem}.w-80{width:20rem}.w-96{width:24rem}.w-full{width:100%}.max-w-2xl{max-width:42rem}.max-w-3xl{max-width:48rem}.max-w-4xl{max-width:56rem}.max-w-5xl{max-width:64rem}.max-w-6xl{max-width:72rem}.max-w-7xl{max-width:80rem}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}.origin-center{transform-origin:center}.-translate-x-1\/2{--tw-translate-x:-50%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.rotate-180{--tw-rotate:180deg;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.rotate-45{--tw-rotate:45deg;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.animate-\[scan_3s_linear_infinite\]{animation:scan 3s linear infinite}@keyframes blob{0%{transform:translate(0px, 0px) scale(1)}33%{transform:translate(30px, -50px) scale(1.1)}66%{transform:translate(-20px, 20px) scale(0.9)}100%{transform:translate(0px, 0px) scale(1)}}.animate-blob{animation:blob 7s infinite}@keyframes bounce{0%, 100%{transform:translateY(-25%);animation-timing-function:cubic-bezier(0.8,0,1,1)}50%{transform:none;animation-timing-function:cubic-bezier(0,0,0.2,1)}}.animate-bounce{animation:bounce 1s infinite}@keyframes marquee{0%{transform:translateX(0%)}100%{transform:translateX(-100%)}}.animate-marquee{animation:marquee 25s linear infinite}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.cursor-default{cursor:default}.cursor-help{cursor:help}.cursor-pointer{cursor:pointer}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.items-stretch{align-items:stretch}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-0{gap:0px}.gap-1{gap:0.25rem}.gap-12{gap:3rem}.gap-16{gap:4rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}.gap-6{gap:1.5rem}.gap-8{gap:2rem}.space-x-8 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(2rem * var(--tw-space-x-reverse));margin-left:calc(2rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.space-y-8 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(2rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(2rem * var(--tw-space-y-reverse))}.divide-y > :not([hidden]) ~ :not([hidden]){--tw-divide-y-reverse:0;border-top-width:calc(1px * calc(1 - var(--tw-divide-y-reverse)));border-bottom-width:calc(1px * var(--tw-divide-y-reverse))}.divide-gray-800 > :not([hidden]) ~ :not([hidden]){--tw-divide-opacity:1;border-color:rgb(31 41 55 / var(--tw-divide-opacity, 1))}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.overflow-x-hidden{overflow-x:hidden}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.whitespace-nowrap{white-space:nowrap}.rounded{border-radius:0.25rem}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.rounded-bl-full{border-bottom-left-radius:9999px}.rounded-br-2xl{border-bottom-right-radius:1rem}.border{border-width:1px}.border-2{border-width:2px}.border-4{border-width:4px}.border-y{border-top-width:1px;border-bottom-width:1px}.border-b{border-bottom-width:1px}.border-b-2{border-bottom-width:2px}.border-l-4{border-left-width:4px}.border-l-\[12px\]{border-left-width:12px}.border-r{border-right-width:1px}.border-t{border-top-width:1px}.border-dashed{border-style:dashed}.border-blue-100{--tw-border-opacity:1;border-color:rgb(219 234 254 / var(--tw-border-opacity, 1))}.border-blue-200{--tw-border-opacity:1;border-color:rgb(191 219 254 / var(--tw-border-opacity, 1))}.border-blue-500\/30{border-color:rgb(59 130 246 / 0.3)}.border-brand-100{--tw-border-opacity:1;border-color:rgb(220 252 231 / var(--tw-border-opacity, 1))}.border-brand-200{--tw-border-opacity:1;border-color:rgb(187 247 208 / var(--tw-border-opacity, 1))}.border-gray-100{--tw-border-opacity:1;border-color:rgb(243 244 246 / var(--tw-border-opacity, 1))}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.border-gray-50{--tw-border-opacity:1;border-color:rgb(249 250 251 / var(--tw-border-opacity, 1))}.border-gray-700{--tw-border-opacity:1;border-color:rgb(55 65 81 / var(--tw-border-opacity, 1))}.border-gray-800{--tw-border-opacity:1;border-color:rgb(31 41 55 / var(--tw-border-opacity, 1))}.border-gray-900{--tw-border-opacity:1;border-color:rgb(17 24 39 / var(--tw-border-opacity, 1))}.border-green-100{--tw-border-opacity:1;border-color:rgb(220 252 231 / var(--tw-border-opacity, 1))}.border-green-50{--tw-border-opacity:1;border-color:rgb(240 253 244 / var(--tw-border-opacity, 1))}.border-green-500\/30{border-color:rgb(34 197 94 / 0.3)}.border-green-500\/50{border-color:rgb(34 197 94 / 0.5)}.border-orange-100{--tw-border-opacity:1;border-color:rgb(255 237 213 / var(--tw-border-opacity, 1))}.border-purple-100{--tw-border-opacity:1;border-color:rgb(243 232 255 / var(--tw-border-opacity, 1))}.border-red-100{--tw-border-opacity:1;border-color:rgb(254 226 226 / var(--tw-border-opacity, 1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-slate-300{--tw-border-opacity:1;border-color:rgb(203 213 225 / var(--tw-border-opacity, 1))}.border-slate-400{--tw-border-opacity:1;border-color:rgb(148 163 184 / var(--tw-border-opacity, 1))}.border-white{--tw-border-opacity:1;border-color:rgb(255 255 255 / var(--tw-border-opacity, 1))}.border-l-blue-500{--tw-border-opacity:1;border-left-color:rgb(59 130 246 / var(--tw-border-opacity, 1))}.border-l-blue-600{--tw-border-opacity:1;border-left-color:rgb(37 99 235 / var(--tw-border-opacity, 1))}.border-l-red-500{--tw-border-opacity:1;border-left-color:rgb(239 68 68 / var(--tw-border-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-\[\#050b14\]{--tw-bg-opacity:1;background-color:rgb(5 11 20 / var(--tw-bg-opacity, 1))}.bg-\[\#0a101f\]{--tw-bg-opacity:1;background-color:rgb(10 16 31 / var(--tw-bg-opacity, 1))}.bg-\[\#0f172a\]{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-\[\#22c55e\]{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.bg-\[\#f0fdf4\]{--tw-bg-opacity:1;background-color:rgb(240 253 244 / var(--tw-bg-opacity, 1))}.bg-black{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity, 1))}.bg-blue-100{--tw-bg-opacity:1;background-color:rgb(219 234 254 / var(--tw-bg-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-blue-900\/10{background-color:rgb(30 58 138 / 0.1)}.bg-brand-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.bg-brand-200{--tw-bg-opacity:1;background-color:rgb(187 247 208 / var(--tw-bg-opacity, 1))}.bg-brand-50{--tw-bg-opacity:1;background-color:rgb(240 253 244 / var(--tw-bg-opacity, 1))}.bg-brand-500{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-gray-50{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.bg-gray-600{--tw-bg-opacity:1;background-color:rgb(75 85 99 / var(--tw-bg-opacity, 1))}.bg-gray-800{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity, 1))}.bg-gray-900{--tw-bg-opacity:1;background-color:rgb(17 24 39 / var(--tw-bg-opacity, 1))}.bg-gray-900\/50{background-color:rgb(17 24 39 / 0.5)}.bg-green-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.bg-green-50{--tw-bg-opacity:1;background-color:rgb(240 253 244 / var(--tw-bg-opacity, 1))}.bg-green-500{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.bg-green-900\/30{background-color:rgb(20 83 45 / 0.3)}.bg-indigo-50{--tw-bg-opacity:1;background-color:rgb(238 242 255 / var(--tw-bg-opacity, 1))}.bg-indigo-700{--tw-bg-opacity:1;background-color:rgb(67 56 202 / var(--tw-bg-opacity, 1))}.bg-orange-50{--tw-bg-opacity:1;background-color:rgb(255 247 237 / var(--tw-bg-opacity, 1))}.bg-purple-100{--tw-bg-opacity:1;background-color:rgb(243 232 255 / var(--tw-bg-opacity, 1))}.bg-purple-200{--tw-bg-opacity:1;background-color:rgb(233 213 255 / var(--tw-bg-opacity, 1))}.bg-purple-50{--tw-bg-opacity:1;background-color:rgb(250 245 255 / var(--tw-bg-opacity, 1))}.bg-purple-600{--tw-bg-opacity:1;background-color:rgb(147 51 234 / var(--tw-bg-opacity, 1))}.bg-red-100{--tw-bg-opacity:1;background-color:rgb(254 226 226 / var(--tw-bg-opacity, 1))}.bg-red-50{--tw-bg-opacity:1;background-color:rgb(254 242 242 / var(--tw-bg-opacity, 1))}.bg-slate-400{--tw-bg-opacity:1;background-color:rgb(148 163 184 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-teal-50{--tw-bg-opacity:1;background-color:rgb(240 253 250 / var(--tw-bg-opacity, 1))}.bg-white\/20{background-color:rgb(255 255 255 / 0.2)}.bg-white\/80{background-color:rgb(255 255 255 / 0.8)}.bg-orange-100{--tw-bg-opacity:1;background-color:rgb(255 237 213 / var(--tw-bg-opacity, 1))}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.bg-gradient-to-l{background-image:linear-gradient(to left, var(--tw-gradient-stops))}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.bg-gradient-to-tr{background-image:linear-gradient(to top right, var(--tw-gradient-stops))}.from-\[\#10b981\]{--tw-gradient-from:#10b981 var(--tw-gradient-from-position);--tw-gradient-to:rgb(16 185 129 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-blue-50{--tw-gradient-from:#eff6ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(239 246 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-blue-600{--tw-gradient-from:#2563eb var(--tw-gradient-from-position);--tw-gradient-to:rgb(37 99 235 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-brand-50{--tw-gradient-from:#f0fdf4 var(--tw-gradient-from-position);--tw-gradient-to:rgb(240 253 244 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-gray-100{--tw-gradient-from:#f3f4f6 var(--tw-gradient-from-position);--tw-gradient-to:rgb(243 244 246 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-gray-50{--tw-gradient-from:#f9fafb var(--tw-gradient-from-position);--tw-gradient-to:rgb(249 250 251 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-pink-50{--tw-gradient-from:#fdf2f8 var(--tw-gradient-from-position);--tw-gradient-to:rgb(253 242 248 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-purple-50{--tw-gradient-from:#faf5ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(250 245 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-transparent{--tw-gradient-from:transparent var(--tw-gradient-from-position);--tw-gradient-to:rgb(0 0 0 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-yellow-50{--tw-gradient-from:#fefce8 var(--tw-gradient-from-position);--tw-gradient-to:rgb(254 252 232 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.via-gray-200{--tw-gradient-to:rgb(229 231 235 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #e5e7eb var(--tw-gradient-via-position), var(--tw-gradient-to)}.to-\[\#059669\]{--tw-gradient-to:#059669 var(--tw-gradient-to-position)}.to-cyan-500{--tw-gradient-to:#06b6d4 var(--tw-gradient-to-position)}.to-gray-200{--tw-gradient-to:#e5e7eb var(--tw-gradient-to-position)}.to-transparent{--tw-gradient-to:transparent var(--tw-gradient-to-position)}.bg-clip-text{-webkit-background-clip:text;background-clip:text}.object-cover{object-fit:cover}.p-0\.5{padding:0.125rem}.p-1{padding:0.25rem}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-1\.5{padding-left:0.375rem;padding-right:0.375rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-20{padding-top:5rem;padding-bottom:5rem}.py-24{padding-top:6rem;padding-bottom:6rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-8{padding-top:2rem;padding-bottom:2rem}.pb-2{padding-bottom:0.5rem}.pb-20{padding-bottom:5rem}.pb-4{padding-bottom:1rem}.pb-8{padding-bottom:2rem}.pl-0{padding-left:0px}.pl-10{padding-left:2.5rem}.pr-0{padding-right:0px}.pt-16{padding-top:4rem}.pt-32{padding-top:8rem}.pt-4{padding-top:1rem}.pt-6{padding-top:1.5rem}.pt-8{padding-top:2rem}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.font-sans{font-family:Inter, sans-serif}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.font-serif{font-family:Inter, sans-serif}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-5xl{font-size:3rem;line-height:1}.text-6xl{font-size:3.75rem;line-height:1}.text-\[10px\]{font-size:10px}.text-\[13vw\]{font-size:13vw}.text-\[16px\]{font-size:16px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-black{font-weight:900}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.italic{font-style:italic}.leading-\[0\.8\]{line-height:0.8}.leading-\[1\.1\]{line-height:1.1}.leading-relaxed{line-height:1.625}.leading-tight{line-height:1.25}.tracking-tight{letter-spacing:-0.025em}.tracking-tighter{letter-spacing:-0.05em}.tracking-wide{letter-spacing:0.025em}.tracking-wider{letter-spacing:0.05em}.tracking-widest{letter-spacing:0.1em}.text-gray-900{--tw-text-opacity:1;color:rgb(17 24 39 / var(--tw-text-opacity, 1))}.text-\[\#15803d\]{--tw-text-opacity:1;color:rgb(21 128 61 / var(--tw-text-opacity, 1))}.text-amber-700{--tw-text-opacity:1;color:rgb(180 83 9 / var(--tw-text-opacity, 1))}.text-black{--tw-text-opacity:1;color:rgb(0 0 0 / var(--tw-text-opacity, 1))}.text-blue-300{--tw-text-opacity:1;color:rgb(147 197 253 / var(--tw-text-opacity, 1))}.text-blue-400{--tw-text-opacity:1;color:rgb(96 165 250 / var(--tw-text-opacity, 1))}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-blue-700\/80{color:rgb(29 78 216 / 0.8)}.text-blue-800{--tw-text-opacity:1;color:rgb(30 64 175 / var(--tw-text-opacity, 1))}.text-brand-500{--tw-text-opacity:1;color:rgb(34 197 94 / var(--tw-text-opacity, 1))}.text-brand-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-brand-700{--tw-text-opacity:1;color:rgb(21 128 61 / var(--tw-text-opacity, 1))}.text-brand-800{--tw-text-opacity:1;color:rgb(22 101 52 / var(--tw-text-opacity, 1))}.text-brand-900{--tw-text-opacity:1;color:rgb(20 83 45 / var(--tw-text-opacity, 1))}.text-cyan-400{--tw-text-opacity:1;color:rgb(34 211 238 / var(--tw-text-opacity, 1))}.text-gray-300{--tw-text-opacity:1;color:rgb(209 213 219 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-green-400{--tw-text-opacity:1;color:rgb(74 222 128 / var(--tw-text-opacity, 1))}.text-green-500{--tw-text-opacity:1;color:rgb(34 197 94 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-green-800{--tw-text-opacity:1;color:rgb(22 101 52 / var(--tw-text-opacity, 1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.text-orange-600{--tw-text-opacity:1;color:rgb(234 88 12 / var(--tw-text-opacity, 1))}.text-orange-700\/80{color:rgb(194 65 12 / 0.8)}.text-orange-800{--tw-text-opacity:1;color:rgb(154 52 18 / var(--tw-text-opacity, 1))}.text-pink-600{--tw-text-opacity:1;color:rgb(219 39 119 / var(--tw-text-opacity, 1))}.text-purple-100{--tw-text-opacity:1;color:rgb(243 232 255 / var(--tw-text-opacity, 1))}.text-purple-400{--tw-text-opacity:1;color:rgb(192 132 252 / var(--tw-text-opacity, 1))}.text-purple-600{--tw-text-opacity:1;color:rgb(147 51 234 / var(--tw-text-opacity, 1))}.text-purple-700{--tw-text-opacity:1;color:rgb(126 34 206 / var(--tw-text-opacity, 1))}.text-red-100{--tw-text-opacity:1;color:rgb(254 226 226 / var(--tw-text-opacity, 1))}.text-red-400{--tw-text-opacity:1;color:rgb(248 113 113 / var(--tw-text-opacity, 1))}.text-red-500{--tw-text-opacity:1;color:rgb(239 68 68 / var(--tw-text-opacity, 1))}.text-red-600{--tw-text-opacity:1;color:rgb(220 38 38 / var(--tw-text-opacity, 1))}.text-red-700{--tw-text-opacity:1;color:rgb(185 28 28 / var(--tw-text-opacity, 1))}.text-red-700\/80{color:rgb(185 28 28 / 0.8)}.text-red-800{--tw-text-opacity:1;color:rgb(153 27 27 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.text-teal-600{--tw-text-opacity:1;color:rgb(13 148 136 / var(--tw-text-opacity, 1))}.text-transparent{color:transparent}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-yellow-400{--tw-text-opacity:1;color:rgb(250 204 21 / var(--tw-text-opacity, 1))}.text-yellow-600{--tw-text-opacity:1;color:rgb(202 138 4 / var(--tw-text-opacity, 1))}.underline{-webkit-text-decoration-line:underline;text-decoration-line:underline}.decoration-gray-300{-webkit-text-decoration-color:#d1d5db;text-decoration-color:#d1d5db}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.opacity-0{opacity:0}.opacity-100{opacity:1}.opacity-20{opacity:0.2}.opacity-30{opacity:0.3}.opacity-40{opacity:0.4}.opacity-50{opacity:0.5}.opacity-60{opacity:0.6}.opacity-80{opacity:0.8}.mix-blend-multiply{mix-blend-mode:multiply}.mix-blend-overlay{mix-blend-mode:overlay}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-\[0_0_15px_rgba\(34\2c 197\2c 94\2c 0\.8\)\]{--tw-shadow:0 0 15px rgba(34,197,94,0.8);--tw-shadow-colored:0 0 15px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-blue-500\/20{--tw-shadow-color:rgb(59 130 246 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.shadow-brand-200{--tw-shadow-color:#bbf7d0;--tw-shadow:var(--tw-shadow-colored)}.shadow-gray-100\/50{--tw-shadow-color:rgb(243 244 246 / 0.5);--tw-shadow:var(--tw-shadow-colored)}.shadow-green-200{--tw-shadow-color:#bbf7d0;--tw-shadow:var(--tw-shadow-colored)}.shadow-green-500\/40{--tw-shadow-color:rgb(34 197 94 / 0.4);--tw-shadow:var(--tw-shadow-colored)}.shadow-purple-500\/20{--tw-shadow-color:rgb(168 85 247 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.ring-4{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(4px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.ring-white{--tw-ring-opacity:1;--tw-ring-color:rgb(255 255 255 / var(--tw-ring-opacity, 1))}.blur-3xl{--tw-blur:blur(64px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.grayscale{--tw-grayscale:grayscale(100%);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-opacity{transition-property:opacity;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-shadow{transition-property:box-shadow;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-transform{transition-property:transform;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.duration-500{transition-duration:500ms}.will-change-transform{will-change:transform}.hover\:-translate-y-0\.5:hover{--tw-translate-y:-0.125rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:-translate-y-1:hover{--tw-translate-y:-0.25rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:-translate-y-2:hover{--tw-translate-y:-0.5rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:scale-110:hover{--tw-scale-x:1.1;--tw-scale-y:1.1;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:scale-\[1\.02\]:hover{--tw-scale-x:1.02;--tw-scale-y:1.02;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:border-brand-300:hover{--tw-border-opacity:1;border-color:rgb(134 239 172 / var(--tw-border-opacity, 1))}.hover\:border-green-500\/50:hover{border-color:rgb(34 197 94 / 0.5)}.hover\:border-red-200:hover{--tw-border-opacity:1;border-color:rgb(254 202 202 / var(--tw-border-opacity, 1))}.hover\:bg-gray-800:hover{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity, 1))}.hover\:bg-green-100:hover{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.hover\:bg-green-400:hover{--tw-bg-opacity:1;background-color:rgb(74 222 128 / var(--tw-bg-opacity, 1))}.hover\:bg-green-500\/10:hover{background-color:rgb(34 197 94 / 0.1)}.hover\:bg-purple-500:hover{--tw-bg-opacity:1;background-color:rgb(168 85 247 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-100:hover{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.hover\:from-blue-500:hover{--tw-gradient-from:#3b82f6 var(--tw-gradient-from-position);--tw-gradient-to:rgb(59 130 246 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:to-cyan-400:hover{--tw-gradient-to:#22d3ee var(--tw-gradient-to-position)}.hover\:text-black:hover{--tw-text-opacity:1;color:rgb(0 0 0 / var(--tw-text-opacity, 1))}.hover\:text-brand-600:hover{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.hover\:text-gray-600:hover{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.hover\:text-purple-800:hover{--tw-text-opacity:1;color:rgb(107 33 168 / var(--tw-text-opacity, 1))}.hover\:text-red-800:hover{--tw-text-opacity:1;color:rgb(153 27 27 / var(--tw-text-opacity, 1))}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.hover\:underline:hover{-webkit-text-decoration-line:underline;text-decoration-line:underline}.hover\:decoration-black:hover{-webkit-text-decoration-color:#000;text-decoration-color:#000}.hover\:opacity-100:hover{opacity:1}.hover\:opacity-80:hover{opacity:0.8}.hover\:shadow-2xl:hover{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.hover\:shadow-md:hover{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.hover\:shadow-xl:hover{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.hover\:grayscale-0:hover{--tw-grayscale:grayscale(0);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.active\:scale-95:active{--tw-scale-x:.95;--tw-scale-y:.95;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.group:hover .group-hover\:rotate-12{--tw-rotate:12deg;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.group:hover .group-hover\:scale-110{--tw-scale-x:1.1;--tw-scale-y:1.1;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.group:hover .group-hover\:border-brand-300{--tw-border-opacity:1;border-color:rgb(134 239 172 / var(--tw-border-opacity, 1))}.group:hover .group-hover\:bg-blue-100{--tw-bg-opacity:1;background-color:rgb(219 234 254 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:bg-brand-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:bg-brand-600{--tw-bg-opacity:1;background-color:rgb(22 163 74 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:bg-gray-700{--tw-bg-opacity:1;background-color:rgb(55 65 81 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:bg-pink-100{--tw-bg-opacity:1;background-color:rgb(252 231 243 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:bg-purple-100{--tw-bg-opacity:1;background-color:rgb(243 232 255 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:bg-red-500{--tw-bg-opacity:1;background-color:rgb(239 68 68 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:bg-yellow-100{--tw-bg-opacity:1;background-color:rgb(254 249 195 / var(--tw-bg-opacity, 1))}.group:hover .group-hover\:from-blue-400{--tw-gradient-from:#60a5fa var(--tw-gradient-from-position);--tw-gradient-to:rgb(96 165 250 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.group:hover .group-hover\:from-brand-400{--tw-gradient-from:#4ade80 var(--tw-gradient-from-position);--tw-gradient-to:rgb(74 222 128 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.group:hover .group-hover\:from-pink-400{--tw-gradient-from:#f472b6 var(--tw-gradient-from-position);--tw-gradient-to:rgb(244 114 182 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.group:hover .group-hover\:from-purple-400{--tw-gradient-from:#c084fc var(--tw-gradient-from-position);--tw-gradient-to:rgb(192 132 252 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.group:hover .group-hover\:from-yellow-400{--tw-gradient-from:#facc15 var(--tw-gradient-from-position);--tw-gradient-to:rgb(250 204 21 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.group:hover .group-hover\:to-blue-600{--tw-gradient-to:#2563eb var(--tw-gradient-to-position)}.group:hover .group-hover\:to-brand-600{--tw-gradient-to:#16a34a var(--tw-gradient-to-position)}.group:hover .group-hover\:to-pink-600{--tw-gradient-to:#db2777 var(--tw-gradient-to-position)}.group:hover .group-hover\:to-purple-600{--tw-gradient-to:#9333ea var(--tw-gradient-to-position)}.group:hover .group-hover\:to-yellow-600{--tw-gradient-to:#ca8a04 var(--tw-gradient-to-position)}.group:hover .group-hover\:text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:text-brand-700{--tw-text-opacity:1;color:rgb(21 128 61 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:text-green-400{--tw-text-opacity:1;color:rgb(74 222 128 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:text-pink-700{--tw-text-opacity:1;color:rgb(190 24 93 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:text-purple-700{--tw-text-opacity:1;color:rgb(126 34 206 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:text-yellow-700{--tw-text-opacity:1;color:rgb(161 98 7 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:opacity-10{opacity:0.1}.group:hover .group-hover\:opacity-100{opacity:1}@media (min-width: 640px){.sm\:block{display:block}.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:pb-24{padding-bottom:6rem}.sm\:pt-44{padding-top:11rem}.sm\:text-2xl{font-size:1.5rem;line-height:2rem}.sm\:text-5xl{font-size:3rem;line-height:1}.sm\:text-\[5\.5rem\]{font-size:5.5rem}}@media (min-width: 768px){.md\:order-1{order:1}.md\:order-2{order:2}.md\:order-3{order:3}.md\:mb-0{margin-bottom:0px}.md\:block{display:block}.md\:flex{display:flex}.md\:w-1\/4{width:25%}.md\:w-5\/12{width:41.666667%}.md\:w-96{width:24rem}.md\:w-\[45\%\]{width:45%}.md\:scale-105{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.md\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}.md\:items-center{align-items:center}.md\:justify-between{justify-content:space-between}.md\:gap-4{gap:1rem}.md\:pl-10{padding-left:2.5rem}.md\:pr-10{padding-right:2.5rem}}@media (min-width: 1024px){.lg\:col-span-1{grid-column:span 1 / span 1}.lg\:col-span-2{grid-column:span 2 / span 2}.lg\:col-span-5{grid-column:span 5 / span 5}.lg\:col-span-7{grid-column:span 7 / span 7}.lg\:flex{display:flex}.lg\:w-1\/4{width:25%}.lg\:w-2\/3{width:66.666667%}.lg\:w-\[30\%\]{width:30%}.lg\:grid-cols-12{grid-template-columns:repeat(12, minmax(0, 1fr))}.lg\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.lg\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.lg\:flex-row{flex-direction:row}.lg\:px-8{padding-left:2rem;padding-right:2rem}}</style></head>
+<body class="bg-white text-gray-900 font-sans antialiased overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo with Smooth Scroll to Top -->
+                <a href="#" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); return false;" class="flex items-center gap-2 group cursor-pointer">
+                    <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center text-white font-bold transform group-hover:rotate-12 transition duration-300">
+                        <i class="fa-solid fa-file-invoice"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-gray-900">Ez<span class="text-brand-600">Bill</span></span>
+                </a>
+                
+                <!-- Updated Navigation Links -->
+                <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-600">
+                    <a href="#parallax-section" class="hover:text-brand-600 transition hover:-translate-y-0.5 inline-block">The Problem</a>
+                    <a href="#features" class="hover:text-brand-600 transition hover:-translate-y-0.5 inline-block">Features</a>
+                    <a href="#how-it-works" class="hover:text-brand-600 transition hover:-translate-y-0.5 inline-block">How it Works</a>
+                    <a href="#architecture" class="hover:text-brand-600 transition hover:-translate-y-0.5 inline-block">Architecture</a>
+                    <a href="#user-journey" class="hover:text-brand-600 transition hover:-translate-y-0.5 inline-block">User Journey</a>
+                    <a href="#impact" class="hover:text-brand-600 transition hover:-translate-y-0.5 inline-block">Impact</a>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <!-- Updated Button with Arrow -->
+                    <a href="https://chee613.github.io/EzBill/" class="bg-black text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-gray-800 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 hover:scale-105 active:scale-95 flex items-center gap-2">
+                        Get Started <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="relative pt-32 pb-20 sm:pt-44 sm:pb-24 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            
+            <!-- Tag -->
+            <div class="reveal-on-scroll is-visible">
+                <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#f0fdf4] text-[#15803d] text-sm font-semibold mb-10 hover:bg-green-100 transition cursor-default shadow-sm border border-green-100">
+                    <span class="flex h-2 w-2 rounded-full bg-[#22c55e] animate-pulse"></span>
+                    Powered by JamAI Base
+                </div>
+            </div>
+
+            <!-- UPDATED HERO TEXT: MATCHING REFERENCE IMAGE -->
+            <h1 class="text-6xl sm:text-[5.5rem] font-bold tracking-tight text-gray-900 mb-8 max-w-5xl mx-auto leading-[1.1] reveal-on-scroll stagger-1 is-visible">
+                The <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#10b981] to-[#059669]">Easiest Way</span> to <br>
+                <span class="text-gray-900">e-Invoice.</span>
+            </h1>
+            
+            <div class="mt-8 text-xl sm:text-2xl text-gray-500 max-w-3xl mx-auto mb-12 reveal-on-scroll stagger-2 space-y-2 font-medium is-visible">
+                <p>Turn any receipt into a validated e-Invoice in seconds.</p>
+                <p class="text-gray-900 font-bold">
+                    Zero manual entry. Fully compliant.
+                </p>
+            </div>
+
+            <!-- Shortcut Button to Video -->
+            <div class="flex justify-center mb-16 reveal-on-scroll stagger-2 relative z-20 is-visible">
+                <a href="#demo-video" class="group flex items-center gap-3 px-6 py-3 bg-white text-gray-900 rounded-full border border-gray-200 shadow-lg shadow-gray-100/50 hover:shadow-xl hover:border-brand-300 hover:-translate-y-0.5 transition-all duration-300">
+                    <div class="w-10 h-10 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center border border-brand-100 group-hover:scale-110 group-hover:bg-brand-600 group-hover:text-white transition-all duration-300">
+                        <i class="fa-solid fa-play text-xs ml-1"></i>
+                    </div>
+                    <span class="font-bold text-lg tracking-tight">Watch 1-min Demo</span>
+                </a>
+            </div>
+
+            <!-- Interactive Demo Area (Mimicking GPTInf Input/Output) -->
+            <div class="mt-12 max-w-6xl mx-auto reveal-on-scroll stagger-3 is-visible">
+        
+        <div class="bg-[#050b14] rounded-xl border border-gray-800 shadow-2xl overflow-hidden relative font-sans">
+            
+            <div class="h-14 border-b border-gray-800 flex items-center justify-between px-6 bg-[#050b14]">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded border border-green-500/30 flex items-center justify-center text-green-500">
+                         <i class="fa-solid fa-expand"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-bold text-sm tracking-wide">EzBill</h3>
+                        <p class="text-[10px] text-green-500 uppercase tracking-widest font-semibold">LHDN Compliance Unit</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                     <button class="text-gray-400 hover:text-white transition"><i class="fa-solid fa-gear"></i></button>
+                     <button class="bg-green-500 hover:bg-green-400 text-black text-xs font-bold px-4 py-2 rounded flex items-center gap-2 transition">
+                        <i class="fa-solid fa-download"></i> Extension
+                     </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-0">
+                
+                <div class="lg:col-span-5 p-6 border-r border-gray-800 bg-[#050b14] flex flex-col gap-6">
+                    
+                    <div class="relative w-full aspect-[3/4] rounded-lg border-2 border-dashed border-gray-700 bg-gray-900/50 overflow-hidden group cursor-pointer hover:border-green-500/50 transition duration-300">
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-500 group-hover:text-green-400 transition">
+                             <i class="fa-solid fa-file-invoice text-4xl mb-4 opacity-50"></i>
+                             <p class="text-xs font-mono uppercase tracking-widest">Upload Receipt</p>
+                        </div>
+                        
+                        <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&amp;fit=crop&amp;q=80&amp;w=600" class="absolute inset-0 w-full h-full object-cover opacity-40 hover:opacity-80 transition duration-500 mix-blend-overlay" alt="Receipt">
+                        
+                        <div class="absolute top-0 left-0 w-full h-1 bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.8)] animate-[scan_3s_linear_infinite]"></div>
+                    </div>
+
+                    <div class="bg-[#0a101f] rounded-lg border border-gray-800 p-4 font-mono text-[10px] h-48 overflow-y-auto custom-scrollbar">
+                        <div class="flex items-center gap-2 mb-2 text-gray-400 border-b border-gray-800 pb-2">
+                            <i class="fa-solid fa-terminal"></i> SYSTEM OPERATIONS
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-gray-500">[09:45:50 PM] &gt; File: Receipt_001.jpg</p>
+                            <p class="text-gray-500">[09:45:55 PM] &gt; File Encrypting &amp; Uploading...</p>
+                            <p class="text-green-500">[09:45:59 PM] <i class="fa-solid fa-check mr-1"></i> File encrypted &amp; uploaded.</p>
+                            <p class="text-gray-500">[09:45:59 PM] &gt; Engaging JamAI Neural Engine...</p>
+                            <p class="text-green-500">[09:46:48 PM] <i class="fa-solid fa-check mr-1"></i> Neural analysis complete.</p>
+                            <p class="text-blue-400 animate-pulse">[09:47:00 PM] &gt; Validating Tax Codes (RAG)...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7 p-6 bg-[#050b14] flex flex-col">
+                    
+                    <button class="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold py-3 rounded-lg shadow-lg shadow-blue-500/20 mb-6 flex items-center justify-center gap-2 transition uppercase tracking-widest text-sm">
+                        <i class="fa-solid fa-bolt"></i> Process Invoice
+                    </button>
+
+                    <div class="flex-1 border border-gray-700 rounded-lg p-5 relative overflow-hidden">
+                        <div class="absolute top-4 right-4 bg-green-900/30 text-green-400 border border-green-500/50 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i> Valid
+                        </div>
+                        
+                        <h4 class="text-green-400 font-bold text-sm uppercase tracking-wider mb-6 flex items-center gap-2">
+                            <i class="fa-solid fa-database"></i> Extracted Data
+                        </h4>
+
+                        <div class="grid grid-cols-2 gap-6 mb-6">
+                            <div class="space-y-4">
+                                <p class="text-[10px] text-red-400 font-bold uppercase tracking-widest mb-2">Supplier Information *</p>
+                                
+                                <div>
+                                    <label class="block text-[10px] text-gray-500 uppercase font-bold mb-1">Entity Name</label>
+                                    <div class="bg-[#0f172a] border border-gray-700 rounded px-3 py-2 text-xs text-gray-300 flex items-center gap-2">
+                                        <i class="fa-regular fa-building text-gray-600"></i> MERGONG TILING SDN BHD
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-gray-500 uppercase font-bold mb-1">TIN (Tax ID)</label>
+                                    <div class="bg-[#0f172a] border border-gray-700 rounded px-3 py-2 text-xs text-gray-300 flex items-center gap-2">
+                                        <i class="fa-solid fa-hashtag text-gray-600"></i> C2384910200
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <p class="text-[10px] text-red-400 font-bold uppercase tracking-widest mb-2">Buyer Information *</p>
+                                
+                                <div>
+                                    <label class="block text-[10px] text-gray-500 uppercase font-bold mb-1">Entity Name</label>
+                                    <div class="bg-[#0f172a] border border-gray-700 rounded px-3 py-2 text-xs text-gray-300 flex items-center gap-2">
+                                        <i class="fa-regular fa-building text-gray-600"></i> LKL SETIA ENTERPRISE
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-gray-500 uppercase font-bold mb-1">Address</label>
+                                    <div class="bg-[#0f172a] border border-gray-700 rounded px-3 py-2 text-xs text-gray-300 flex items-center gap-2 truncate">
+                                        <i class="fa-solid fa-location-dot text-gray-600"></i> NO.61, TAMAN BERSATU, JALAN...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border border-blue-500/30 bg-blue-900/10 rounded-lg p-4 mb-6">
+                            <div class="flex items-center gap-2 mb-3">
+                                <i class="fa-solid fa-brain text-cyan-400 text-xs"></i>
+                                <span class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Neural Classification (RAG)</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="bg-gray-900 text-white font-mono font-bold text-lg px-3 py-1 rounded border border-gray-700">46633</div>
+                                <span class="text-xs text-blue-300 italic">Matched: Wholesale of construction materials</span>
+                            </div>
+                        </div>
+
+                        <div class="overflow-hidden rounded border border-gray-800 mb-6">
+                             <table class="w-full text-left text-[10px]">
+                                <thead class="bg-gray-800 text-gray-400 font-bold uppercase">
+                                    <tr>
+                                        <th class="px-3 py-2">Description</th>
+                                        <th class="px-3 py-2 text-right">Qty</th>
+                                        <th class="px-3 py-2 text-right">Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-800 text-gray-300 font-mono">
+                                    <tr>
+                                        <td class="px-3 py-2">SR 48X40 YL4146M-G2-523-(9P56C)</td>
+                                        <td class="px-3 py-2 text-right">405</td>
+                                        <td class="px-3 py-2 text-right text-green-400">3.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2">SR 60X60 PD6063 BLACK GALAXY...</td>
+                                        <td class="px-3 py-2 text-right">13</td>
+                                        <td class="px-3 py-2 text-right text-green-400">18.00</td>
+                                    </tr>
+                                </tbody>
+                             </table>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-800">
+                             <div>
+                                 <p class="text-[10px] text-gray-500 font-bold uppercase">Total Payable</p>
+                                 <p class="text-xl font-bold text-green-400">RM 2,071.25</p>
+                             </div>
+                             <div class="flex gap-3">
+                                 <button class="px-4 py-2 border border-green-500/50 text-green-400 rounded hover:bg-green-500/10 text-xs font-bold uppercase transition">
+                                     <i class="fa-solid fa-download mr-1"></i> JSON
+                                 </button>
+                                 <button class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded shadow-lg shadow-purple-500/20 text-xs font-bold uppercase transition flex items-center gap-2">
+                                     <i class="fa-solid fa-paper-plane"></i> Submit
+                                 </button>
+                             </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute bottom-6 right-6 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-green-500/40 cursor-pointer hover:scale-110 transition z-50">
+                <i class="fa-regular fa-comment-dots text-xl"></i>
+            </div>
+        </div>
+
+        <div class="mt-8 flex flex-wrap justify-center gap-6 text-gray-900 text-xl font-medium">
+             <span class="flex items-center gap-2 hover:text-brand-600 transition duration-300 cursor-help"><i class="fa-solid fa-shield-halved"></i> Data Privacy First</span>
+             <span class="flex items-center gap-2 hover:text-brand-600 transition duration-300 cursor-help"><i class="fa-solid fa-database"></i> Powered by JamAI</span>
+             <span class="flex items-center gap-2 hover:text-brand-600 transition duration-300 cursor-help"><i class="fa-solid fa-language"></i> Manglish Supported</span>
+        </div>
+    </div>
+        </div>
+        
+        <!-- Background Decor -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0 pointer-events-none">
+            <div class="absolute top-20 left-10 w-96 h-96 bg-brand-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+            <div class="absolute top-20 right-10 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+        </div>
+    </div>
+
+    <!-- PARALLAX SOLUTION SCROLL SECTION -->
+    <!-- Increased height to 500vh to allow for 5 cards sequence -->
+    <div id="parallax-section" class="relative h-[500vh] bg-gray-50">
+        
+        <!-- Sticky Container -->
+        <div class="sticky top-0 h-screen overflow-hidden flex flex-col items-center justify-center">
+            
+            <!-- Huge Background Text - Darker and More Opaque -->
+            <div class="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
+                <h2 class="text-[13vw] font-bold text-gray-400 leading-[0.8] text-center tracking-tighter uppercase opacity-80">
+                    SME Compliance<br>Struggles
+                </h2>
+            </div>
+
+            <!-- Cards Container -->
+            <div id="parallax-cards-container" class="relative w-full max-w-5xl h-[500px] flex items-center justify-center z-10">
+                
+                <!-- Card 1: ALERT (Modified) -->
+                <div id="p-card-1" class="absolute w-80 md:w-96 min-h-[380px] rounded-3xl p-8 bg-white border-l-[12px] border-l-red-500 shadow-2xl will-change-transform origin-center flex flex-col justify-center transition-shadow duration-300" style="transform: translate(-1746.4px, 0px) rotate(-15deg) scale(0.9); opacity: 0; box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px; z-index: 10;">
+                    <div class="mb-6">
+                        <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-red-50 text-red-500 mb-4 shadow-sm">
+                            <i class="fa-solid fa-bell text-2xl animate-bounce"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-900 font-serif mb-1">Did You Know?</h3>
+                    </div>
+                    
+                    <p class="text-xl text-gray-700 font-medium leading-relaxed">
+                        Starting <span class="text-red-600 font-bold border-b-2 border-red-100">July 2026</span>, SMEs with revenue under <span class="bg-red-50 px-2 py-0.5 rounded text-red-800 font-bold">RM1 million</span> must adopt e-invoicing.
+                    </p>
+                    
+                    <div class="mt-8 pt-6 border-t border-gray-100 flex items-center gap-3 text-sm font-bold text-gray-400 uppercase tracking-widest">
+                         <i class="fa-solid fa-circle-exclamation text-red-500"></i>
+                         <span>Mandatory Compliance</span>
+                    </div>
+                </div>
+
+                <!-- Card 2: Hafidzi (MICCI) - REINDEXED from 3 to 2 -->
+                <div id="p-card-2" class="absolute w-80 md:w-96 min-h-[380px] rounded-3xl p-8 bg-white shadow-2xl will-change-transform origin-center flex flex-col justify-between transition-shadow duration-300" style="transform: translate(-1746.4px, 0px) rotate(-15deg) scale(0.9); opacity: 0; box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px; z-index: 10;">
+                    <div class="relative">
+                        <i class="fa-solid fa-quote-left text-5xl text-red-100 absolute -top-4 -left-2 opacity-50"></i>
+                        <p class="relative z-10 text-xl text-gray-700 font-medium leading-relaxed pt-4">“The pressure to adopt different compliance requirements could divert attention away from crucial sales opportunities, risking financial setbacks for entrepreneurs already navigating economic uncertainties.”</p>
+                    </div>
+                    <div class="flex items-center gap-4 mt-6 pt-6 border-t border-gray-50">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Hafidzi" alt="Hafidzi" class="w-14 h-14 rounded-full bg-red-50 p-1 border-2 border-red-100">
+                        <div>
+                            <p class="text-base font-bold text-gray-900">Hafidzi Razali</p>
+                            <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Spokesperson • MICCI E-commerce</p>
+                            <a href="https://www.nst.com.my/news/nation/2025/02/1177076/malaysias-e-invoicing-mandate-supporting-small-businesses" target="_blank" class="text-[16px] text-red-600 hover:text-red-800 hover:underline flex items-center gap-1 font-bold">
+                                <i class="fa-solid fa-newspaper"></i> Source: NST
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Farah - REINDEXED from 4 to 3 -->
+                <div id="p-card-3" class="absolute w-80 md:w-96 min-h-[380px] rounded-3xl p-8 bg-white shadow-2xl will-change-transform origin-center flex flex-col justify-between transition-shadow duration-300" style="transform: translate(-1746.4px, 0px) rotate(-15deg) scale(0.9); opacity: 2.22045e-16; box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px; z-index: 10;">
+                    <div class="relative">
+                        <i class="fa-solid fa-quote-left text-5xl text-purple-100 absolute -top-4 -left-2 opacity-50"></i>
+                        <p class="relative z-10 text-2xl text-gray-700 font-medium leading-relaxed pt-4">“e-invoicing adds my burden, now I must navigate unfamiliar invoicing systems while preparing for my busiest sales period during Ramadan.”</p>
+                    </div>
+                    <div class="flex items-center gap-4 mt-6 pt-6 border-t border-gray-50">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Farah" alt="Farah" class="w-14 h-14 rounded-full bg-purple-50 p-1 border-2 border-purple-100">
+                        <div>
+                            <p class="text-base font-bold text-gray-900">Farah Nordiana</p>
+                            <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Keropok Seller • Kuala Besut</p>
+                            <a href="https://www.nst.com.my/news/nation/2025/02/1177076/malaysias-e-invoicing-mandate-supporting-small-businesses" target="_blank" class="text-[16px] text-purple-600 hover:text-purple-800 hover:underline flex items-center gap-1 font-bold">
+                                <i class="fa-solid fa-newspaper"></i> Source: NST
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW SECTION: Reality Check (Added Here) -->
+    <div id="problem-stats" class="py-24 bg-white border-y border-gray-100 relative z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal-on-scroll is-visible">
+                <span class="text-red-600 font-bold tracking-wide uppercase text-sm bg-red-50 px-3 py-1 rounded-full border border-red-100">The Reality Check</span>
+                <h2 class="text-4xl font-bold text-gray-900 mt-4 font-serif">Is Your Business Ready for July 2026?</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto text-lg">
+                    <span class="font-semibold text-gray-900">Manual invoicing is now obsolete.</span> The old way of accounting is too slow, too risky, and too error-prone for the new digital era.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                
+                <!-- Left: Impact Metrics (Hard Facts) -->
+                <div class="space-y-6 reveal-on-scroll is-visible">
+                    <!-- Metric 1: The Fine -->
+                    <div class="bg-orange-50 rounded-2xl p-6 border border-orange-100 flex items-center gap-5 transition-transform hover:scale-[1.02] cursor-default">
+                        <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-orange-600 text-2xl shadow-sm shrink-0">
+                            <i class="fa-solid fa-hourglass-half"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-orange-800 uppercase tracking-wider mb-1">Micro-SME Deadline</p>
+                            <div class="text-3xl font-black text-gray-900">July 1, 2026</div>
+                            <p class="text-sm text-orange-700/80 mt-1">Mandatory for businesses with revenue &lt; RM1 Million.</p>
+                        </div>
+                    </div>
+<div class="bg-red-50 rounded-2xl p-6 border border-red-100 flex items-center gap-5 transition-transform hover:scale-[1.02] cursor-default">
+                        <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-red-600 text-2xl shadow-sm shrink-0">
+                            <i class="fa-solid fa-gavel"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-red-800 uppercase tracking-wider mb-1">Penalty Risk</p>
+                            <div class="text-3xl font-black text-gray-900">RM 20,000</div>
+                            <p class="text-sm text-red-700/80 mt-1">Penalties include fines ranging from RM200 to RM20,000 or imprisonment</p>
+                        </div>
+                    </div>
+
+                    <!-- Metric 2: The Deadline -->
+                    
+
+                    <!-- Metric 3: The Grace Period -->
+                    <div class="bg-blue-50 rounded-2xl p-6 border border-blue-100 flex items-center gap-5 transition-transform hover:scale-[1.02] cursor-default">
+                        <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-blue-600 text-2xl shadow-sm shrink-0">
+                            <i class="fa-solid fa-hand-holding-heart"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-blue-800 uppercase tracking-wider mb-1">Soft Landing</p>
+                            <div class="text-3xl font-black text-gray-900">6 Months</div>
+                            <p class="text-sm text-blue-700/80 mt-1">Relaxed penalties &amp; consolidated invoices allowed upon implementation.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Concrete Comparison (Problem vs Solution) -->
+                <div class="col-span-1 lg:col-span-1 mt-0 reveal-on-scroll stagger-1 is-visible">
+                      <div class="space-y-8 relative">
+                        
+                        <!-- The Problem (Manual) -->
+                        <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm relative overflow-hidden group hover:border-red-200 transition-colors">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-gray-100 group-hover:bg-red-500 transition-colors"></div>
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center text-xl">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900">The Manual Way</h3>
+                            </div>
+                            <ul class="space-y-4">
+                                <li class="flex items-start gap-3">
+                                    <i class="fa-solid fa-clock text-red-500 mt-1.5 shrink-0"></i>
+                                    <span class="text-gray-600">Wastes <strong>10-20 mins</strong> per invoice keying in data &amp; verifying TINs.</span>
+                                </li>
+<li class="flex items-start gap-3">
+                                    <i class="fa-solid fa-triangle-exclamation text-red-500 mt-1.5 shrink-0"></i>
+                                    <span class="text-gray-600">High risk of <strong>RM20k fines</strong> due to human typos &amp; errors in 55+ mandatory fields.</span>
+                                </li>
+                                
+                                <li class="flex items-start gap-3">
+                                    <i class="fa-solid fa-book-dead text-red-500 mt-1.5 shrink-0"></i>
+                                    <span class="text-gray-600">Requires memorizing complex <strong>LHDN classification codes &amp; rules guidelines for JSON</strong>.</span>
+                                </li>
+                                <li class="flex items-start gap-3 bg-red-50 p-3 rounded-xl border border-red-100">
+                                    <i class="fa-solid fa-layer-group text-red-600 mt-1.5 shrink-0"></i>
+                                    <span class="text-gray-800 text-xl">Existing tools are built for <strong class="text-red-700 text-xl">costly corporate ERP systems</strong>, not small vendors.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- The Solution (EzBill) -->
+                        <div class="bg-brand-50 p-8 rounded-3xl border border-brand-200 shadow-md relative overflow-hidden transform md:scale-105 z-10 ring-4 ring-white">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-brand-100 rounded-bl-full opacity-50 -mr-4 -mt-4"></div>
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 bg-brand-500 text-white rounded-xl flex items-center justify-center text-xl shadow-lg shadow-brand-200">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-brand-900">The EzBill Way</h3>
+                            </div>
+                            <ul class="space-y-4 text-lg">
+                                <li class="flex items-start gap-3">
+                                    <div class="mt-1 bg-white rounded-full p-0.5 shrink-0"><i class="fa-solid fa-circle-check text-brand-500"></i></div>
+                                    <span class="text-brand-800"><strong>100% Compliant</strong> using AI-powered pre-validation checks.</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <div class="mt-1 bg-white rounded-full p-0.5 shrink-0"><i class="fa-solid fa-bolt text-brand-500"></i></div>
+                                    <span class="text-brand-800">Process receipts in <strong>≤ 30 seconds</strong> via Smart OCR scan.</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <div class="mt-1 bg-white rounded-full p-0.5 shrink-0"><i class="fa-solid fa-wand-magic-sparkles text-brand-500"></i></div>
+                                    <span class="text-brand-800"><strong>Auto-assigns</strong> correct Tax Codes &amp; Classifications instantly.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW SECTION: Media Coverage (Added Here) -->
+    <div class="bg-gray-50 py-20 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Added justify-center to center the header -->
+            <div class="flex items-center justify-center gap-3 mb-10 reveal-on-scroll is-visible">
+                <i class="fa-solid fa-newspaper text-2xl text-brand-600"></i>
+                <h2 class="text-2xl font-bold text-gray-900">Media Coverage</h2>
+            </div>
+
+            <!-- UPDATED: Single Column Stack (Line by Line) -->
+            <div class="flex flex-col gap-4 max-w-3xl mx-auto">
+                
+                <!-- Card 1: ClearTax -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-red-500 reveal-on-scroll flex flex-col md:flex-row md:items-center md:justify-between gap-4 is-visible">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                             <span class="text-xs font-bold text-red-600 uppercase tracking-wide">ClearTax</span>
+                             
+                        </div>
+                        <p class="text-gray-900 font-medium text-base leading-relaxed">
+                            "Penalties for Non-Compliance with E-invoicing rules include fines up to RM20,000 or imprisonment"
+                        </p>
+                    </div>
+                    <a href="https://www.cleartax.com/my/en/einvoice-malaysia-penalties" target="_blank" class="text-brand-600 text-sm font-semibold hover:underline flex items-center gap-1 whitespace-nowrap shrink-0">
+                        Verify Source <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
+
+                <!-- Card 2: The Edge -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-blue-500 reveal-on-scroll stagger-1 flex flex-col md:flex-row md:items-center md:justify-between gap-4 is-visible">
+                    <div class="flex-1">
+                         <div class="flex items-center gap-3 mb-2">
+                            <span class="text-xs font-bold text-blue-600 uppercase tracking-wide">The Edge Malaysia</span>
+                            
+                        </div>
+                        <p class="text-gray-900 font-medium text-base leading-relaxed">
+                            "SMEs face huge challenges in implementing e-invoicing"
+                        </p>
+                    </div>
+                    <a href="https://theedgemalaysia.com/node/721028" target="_blank" class="text-brand-600 text-sm font-semibold hover:underline flex items-center gap-1 whitespace-nowrap shrink-0">
+                        Verify Source <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
+
+                <!-- Card 3: ResearchGate -->
+                
+
+                <!-- Card 4: ProCheck -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-red-500 reveal-on-scroll stagger-3 flex flex-col md:flex-row md:items-center md:justify-between gap-4 is-visible">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-xs font-bold text-red-600 uppercase tracking-wide">TheStar</span>
+                            
+                        </div>
+                        <p class="text-gray-900 font-medium text-base leading-relaxed">
+                            "SMEs face hurdles ahead of mandatory e-invoicing rule"
+                        </p>
+                    </div>
+                    <a href="https://procheck.com.my/e-invoice-implementation-date/" target="_blank" class="text-brand-600 text-sm font-semibold hover:underline flex items-center gap-1 whitespace-nowrap shrink-0">
+                        Verify Source <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION: Why Choose EzBill (Features) - RESTORED FROM YOUR CODE -->
+    <div id="features" class="py-24 bg-gray-50 relative">
+        <!-- Decoration -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+             <div class="absolute -left-10 top-1/4 w-64 h-64 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16 reveal-on-scroll is-visible">
+                <h2 class="text-6xl font-bold text-gray-900">Why choose EzBill?</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">We solve the specific pain points of Malaysian SMEs that generic OCR tools miss.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition duration-300 reveal-on-scroll is-visible">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl mb-6">
+                        <i class="fa-solid fa-file-invoice"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Smart Malaysian OCR</h3>
+                    <p class="text-gray-600 leading-relaxed">Reads messy "kedai runcit" receipts, Shopee invoices, and GrabFood summaries. Handles "Manglish" effortlessy.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition duration-300 reveal-on-scroll stagger-1 is-visible">
+                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center text-xl mb-6">
+                        <i class="fa-solid fa-check-double"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">RAG-Powered Validation</h3>
+                    <p class="text-gray-600 leading-relaxed">Built on <strong>JamAI Base</strong>. with Knowledge Table including LHDN guidelines, FAQs, MyInvois SDK.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition duration-300 reveal-on-scroll stagger-2 is-visible">
+                    <div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center text-xl mb-6">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">One-Click Submit</h3>
+                    <p class="text-gray-600 leading-relaxed">Instantly sends compliant e-invoice JSON data directly to the MyInvois API with a single click.</p>
+                </div>
+                
+                 <!-- Feature 4 -->
+                 <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition duration-300 reveal-on-scroll stagger-3 is-visible">
+                    <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center text-xl mb-6">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Bahasa Rojak Chatbot</h3>
+                    <p class="text-gray-600 leading-relaxed">Answer all questions regarding LHDN Guidelines with clear explanations in English or BM.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION: How It Works (Step-by-Step Guide) -->
+    <div id="how-it-works" class="py-24 bg-white border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Header -->
+            <div class="text-center mb-20 reveal-on-scroll is-visible">
+                <div class="inline-block mb-4">
+                    <span class="py-1 px-3 rounded-full bg-[#f0fdf4] text-[#15803d] text-xs font-bold uppercase tracking-wider border border-green-100">
+                        Step-by-Step Guide
+                    </span>
+                </div>
+                <h2 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 mb-6 leading-tight">
+                    From Receipt to <br class="hidden sm:block">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#10b981] to-[#059669]">Validated e-Invoice.</span>
+                </h2>
+                <p class="mt-4 text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
+                    Follow this simple workflow on our mobile app or web dashboard to ensure <span class="font-semibold text-gray-900">100% LHDN compliance</span> in under 30 seconds.
+                </p>
+            </div>
+
+            <!-- Steps Container -->
+            <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-12 md:gap-4">
+                
+                <!-- Connecting Line (Desktop Only) -->
+                <div class="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gray-100 -z-10"></div>
+
+                <!-- Step 1 -->
+                <div class="flex flex-col items-center text-center w-full md:w-1/4 reveal-on-scroll stagger-1 relative group is-visible">
+                    <div class="w-24 h-24 rounded-full bg-white border-4 border-green-50 shadow-xl flex items-center justify-center mb-6 relative z-10 group-hover:scale-110 transition-transform duration-300">
+                        <div class="w-10 h-10 bg-gray-900 rounded-full absolute -top-2 -right-2 flex items-center justify-center text-white font-bold border-4 border-white">1</div>
+                        <i class="fa-solid fa-camera text-3xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Snap Photo</h3>
+                    <p class="text-gray-500 text-sm">Or upload existing Image</p>
+                </div>
+
+                <!-- Arrow 1 -->
+                <div class="hidden md:block text-gray-300 text-2xl reveal-on-scroll stagger-1 is-visible">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex flex-col items-center text-center w-full md:w-1/4 reveal-on-scroll stagger-2 relative group is-visible">
+                    <div class="w-24 h-24 rounded-full bg-white border-4 border-green-50 shadow-xl flex items-center justify-center mb-6 relative z-10 group-hover:scale-110 transition-transform duration-300">
+                        <div class="w-10 h-10 bg-gray-900 rounded-full absolute -top-2 -right-2 flex items-center justify-center text-white font-bold border-4 border-white">2</div>
+                        <i class="fa-solid fa-wand-magic-sparkles text-3xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">AI Extraction</h3>
+                    <p class="text-gray-500 text-sm">Smart OCR &amp; Data Parsing</p>
+                </div>
+
+                <!-- Arrow 2 -->
+                <div class="hidden md:block text-gray-300 text-2xl reveal-on-scroll stagger-2 is-visible">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex flex-col items-center text-center w-full md:w-1/4 reveal-on-scroll stagger-3 relative group is-visible">
+                    <div class="w-24 h-24 rounded-full bg-white border-4 border-green-50 shadow-xl flex items-center justify-center mb-6 relative z-10 group-hover:scale-110 transition-transform duration-300">
+                        <div class="w-10 h-10 bg-gray-900 rounded-full absolute -top-2 -right-2 flex items-center justify-center text-white font-bold border-4 border-white">3</div>
+                        <i class="fa-solid fa-magnifying-glass text-3xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Review &amp; Verify</h3>
+                    <p class="text-gray-500 text-sm">Confirm auto-filled details</p>
+                </div>
+
+                <!-- Arrow 3 -->
+                <div class="hidden md:block text-gray-300 text-2xl reveal-on-scroll stagger-3 is-visible">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="flex flex-col items-center text-center w-full md:w-1/4 reveal-on-scroll stagger-1 relative group is-visible">
+                    <div class="w-24 h-24 rounded-full bg-green-500 shadow-xl shadow-green-200 flex items-center justify-center mb-6 relative z-10 group-hover:scale-110 transition-transform duration-300">
+                        <div class="w-10 h-10 bg-gray-900 rounded-full absolute -top-2 -right-2 flex items-center justify-center text-white font-bold border-4 border-white">4</div>
+                        <i class="fa-solid fa-check text-4xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">One-Click Submit</h3>
+                    <p class="text-gray-500 text-sm">Sent directly to LHDN MyInvois API</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Video Section (NEW) -->
+    <div id="demo-video" class="py-24 bg-gray-50 border-b border-gray-100 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16 reveal-on-scroll is-visible">
+                <span class="text-brand-600 font-bold tracking-wide uppercase text-sm bg-brand-50 px-3 py-1 rounded-full border border-brand-100">See it in Action</span>
+                <h2 class="text-4xl font-bold text-gray-900 mt-4">Watch How EzBill Works</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto text-lg">A quick 1-minute walkthrough of scanning a receipt and submitting an e-Invoice.</p>
+            </div>
+
+            <!-- Video Container -->
+            <div class="max-w-4xl mx-auto reveal-on-scroll stagger-1 is-visible">
+                <div class="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-gray-900 aspect-video group cursor-pointer">
+                    
+                    <!-- Placeholder Content (Visible when no video is loaded) -->
+                    <!-- User: Replace the 'src' in the iframe below with your actual video URL -->
+                    <!-- Example: https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1 -->
+                    
+                    <div class="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 text-white z-10 group-hover:bg-gray-700 transition duration-300">
+                        <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fa-solid fa-play text-3xl ml-1 text-white"></i>
+                        </div>
+                        <p class="font-medium text-gray-300 group-hover:text-white transition-colors">Click to Play Demo</p>
+                    </div>
+                    
+                    <!-- Real Video Iframe (Uncomment and add src to use) -->
+                    <!-- 
+                    <iframe 
+                        class="absolute inset-0 w-full h-full z-20" 
+                        src="https://drive.google.com/file/d/1DvgMFsVQCZv5O-WauuSOGkuPMizRoK-r/view?usp=sharing" 
+                        title="EzBill Demo Video" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe> 
+                    -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Architecture (New Section - Light Theme) -->
+    
+    <div id="architecture" class="py-8 bg-gray-50 relative overflow-hidden font-sans font-bold text-slate-900">
+    <div class="absolute inset-0 opacity-30 pointer-events-none">
+         <div class="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-gray-100 to-transparent"></div>
+         <div class="absolute left-0 bottom-0 w-1/3 h-full bg-gradient-to-r from-gray-100 to-transparent"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center mb-6 reveal-on-scroll is-visible">
+            <span class="text-brand-600 font-bold tracking-wide uppercase text-lg bg-brand-50 px-3 py-1 rounded-full border border-brand-100">Tech Stack</span>
+            <h2 class="text-5xl font-bold text-gray-900 mt-4">System Architecture &amp; Data Flow</h2>
+            <p class="mt-4 text-gray-900 max-w-2xl mx-auto text-2xl font-bold">
+                A unified <strong>JamAI Base</strong> backend powering two distinct intelligent workflows: 
+                <span class="text-purple-700 font-bold">Automated JSON Processing</span> and 
+                <span class="text-blue-700 font-bold">MyInvois Context-Aware Chat</span>.
+            </p>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-4 items-stretch justify-center">
+            
+            <div class="w-full lg:w-1/4 flex flex-col gap-4 reveal-on-scroll is-visible">
+                <div class="bg-white p-4 rounded-2xl border-2 border-gray-900 shadow-xl relative z-20">
+                    <div class="absolute -top-3 left-6 bg-gray-900 text-white text-base font-bold px-3 py-1 rounded-full uppercase tracking-wider">Frontend</div>
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center text-4xl mb-4 text-gray-900">
+                            <i class="fa-solid fa-laptop-code"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-900">EzBill HTML GUI</h3>
+                        <p class="text-base text-gray-900 mt-2 font-bold bg-gray-50 px-2 py-1 rounded border border-gray-200">
+                            HTML5 • Tailwind • React/JSX
+                        </p>
+                        <div class="mt-4 text-lg text-gray-900 space-y-2 font-bold">
+                            <p><i class="fa-solid fa-arrow-up-from-bracket mr-2"></i>User Uploads Receipt</p>
+                            <p><i class="fa-solid fa-download mr-2"></i>Receives JSON</p>
+                            <p><i class="fa-regular fa-paper-plane mr-2"></i>Submits to LHDN</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border-2 border-dashed border-gray-300 shadow-sm relative z-10 mt-auto opacity-100 hover:opacity-100 transition">
+                    <div class="absolute -top-3 left-6 bg-gray-600 text-white text-base font-bold px-3 py-1 rounded-full uppercase tracking-wider">External API</div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-3xl text-gray-900">
+                            <i class="fa-solid fa-globe"></i>
+                        </div>
+                        <div class="text-left">
+                            <h4 class="font-bold text-gray-900 text-lg">LHDN MyInvois API</h4>
+                            <p class="text-base text-gray-900 font-bold">Submission Endpoint</p>
+                            <div class="flex gap-2 mt-1">
+                                <span class="text-sm bg-green-100 text-green-800 px-1.5 rounded font-bold">202 Accepted</span>
+                                <span class="text-sm bg-red-100 text-red-800 px-1.5 rounded font-bold">400 Error</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden lg:flex flex-col justify-center items-center w-12 text-gray-400 gap-8">
+                <i class="fa-solid fa-arrow-right-arrow-left text-4xl animate-pulse text-gray-900"></i>
+            </div>
+
+            <div class="w-full lg:w-2/3 bg-white rounded-3xl p-5 shadow-2xl relative overflow-hidden reveal-on-scroll stagger-1 border border-slate-200 is-visible">
+                <div class="absolute top-0 left-0 bg-indigo-700 text-white font-bold px-6 py-2 rounded-br-2xl text-lg tracking-widest shadow-lg">
+                    <i class="fa-solid fa-server mr-2"></i> JamAI Base BACKEND
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
+                    
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 relative group hover:bg-slate-100 transition duration-300 shadow-sm">
+                        <div class="flex items-center gap-3 mb-3 border-b border-slate-200 pb-2">
+                            <div class="w-10 h-10 bg-purple-100 text-purple-700 rounded-lg flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-file-code"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-slate-900 font-bold text-xl">Action Table</h4>
+                                <p class="text-base text-purple-700 font-bold">JSON Processing Pipeline</p>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2 relative">
+                            <div class="absolute left-3.5 top-4 bottom-4 w-0.5 bg-slate-400"></div>
+
+                            <div class="relative pl-10">
+                                <div class="absolute left-0 top-1 w-8 h-8 bg-white rounded-full flex items-center justify-center text-base font-bold text-slate-900 border-2 border-slate-400 z-10">1</div>
+                                <h5 class="text-lg font-bold text-slate-900">OCR Extraction</h5>
+                                <p class="text-base text-slate-900 mt-1 font-bold">LLM: <span class="text-amber-700 font-bold">Gemini 2.5 Flash</span></p>
+                                <p class="text-sm text-slate-900 font-bold">Extracts raw text from receipt</p>
+                            </div>
+
+                            <div class="relative pl-10">
+                                <div class="absolute left-0 top-1 w-8 h-8 bg-white rounded-full flex items-center justify-center text-base font-bold text-slate-900 border-2 border-slate-400 z-10">2</div>
+                                <h5 class="text-lg font-bold text-slate-900">Normalize &amp; Comply</h5>
+                                <p class="text-base text-slate-900 mt-1 font-bold">LLM: <span class="text-amber-700 font-bold">Gemini 2.5 Flash</span></p>
+                                <div class="flex items-center gap-1 mt-1">
+                                    <span class="text-sm bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded border border-blue-200 font-bold">RAG</span>
+                                    <span class="text-sm text-slate-900 font-bold">Knowledge Table</span>
+                                </div>
+                                <p class="text-sm text-slate-900 font-bold"> Cleans raw text, extracts fields, and validates the data against tax rules (MSIC, TIN, etc.)</p>
+                            </div>
+
+                            <div class="relative pl-10">
+                                <div class="absolute left-0 top-1 w-8 h-8 bg-white rounded-full flex items-center justify-center text-base font-bold text-slate-900 border-2 border-slate-400 z-10">3</div>
+                                <h5 class="text-lg font-bold text-slate-900">Format JSON</h5>
+                                <p class="text-base text-slate-900 mt-1 font-bold">LLM: <span class="text-amber-700 font-bold">Gemini 2.5 Flash</span></p>
+                                <div class="flex items-center gap-1 mt-1">
+                                    <span class="text-sm bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded border border-blue-200 font-bold">RAG</span>
+                                    <span class="text-sm text-slate-900 font-bold">Knowledge Table</span>
+                                </div>
+                                <p class="text-sm text-slate-900 font-bold">Transforms data into MyInvois JSON format</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 relative group hover:bg-slate-100 transition duration-300 shadow-sm">
+                        <div class="flex items-center gap-3 mb-3 border-b border-slate-200 pb-2">
+                            <div class="w-10 h-10 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-comments"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-slate-900 font-bold text-xl">Chat Table</h4>
+                                <p class="text-base text-blue-700 font-bold">Rojak Language Conversational AI</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
+                                <p class="text-sm text-slate-900 uppercase tracking-wide mb-1 font-bold">Step 1: Input</p>
+                                <p class="text-base text-slate-900 font-bold">"What is the class code of a laptop?"</p>
+                            </div>
+
+                            <div class="flex justify-center text-slate-900 text-base"><i class="fa-solid fa-arrow-down"></i></div>
+
+                            <div class="bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
+                                <p class="text-sm text-slate-900 uppercase tracking-wide mb-1 font-bold">
+                                    Step 2: Retrieval 
+                                    <span class="text-sm bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded border border-blue-200 font-bold ml-2">RAG</span>
+                                </p>
+                                <p class="text-base text-slate-900 font-bold">Queries Knowledge Table (FAQs, SOPs)</p>
+                            </div>
+
+                            <div class="flex justify-center text-slate-900 text-base"><i class="fa-solid fa-arrow-down"></i></div>
+
+                            <div class="bg-white p-2 rounded-xl border border-slate-200 border-l-4 border-l-blue-600 shadow-sm">
+                                <p class="text-sm text-slate-900 uppercase tracking-wide mb-1 font-bold">
+                                    Step 3: Generation
+                                    <span class="text-sm bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded border border-blue-200 font-bold ml-2">RAG</span>
+                                </p>
+                                <p class="text-base text-slate-900 mb-1 font-bold">LLM: <span class="text-amber-700 font-bold">ELLM Qwen3</span></p>
+                                <p class="text-base text-slate-900 font-bold">"Laptops are classified under code 003..."</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="mt-4 bg-slate-50 rounded-xl p-3 border border-slate-200 flex items-center justify-center gap-6">
+                    <span class="text-base text-slate-900 uppercase tracking-widest font-bold">Shared Knowledge Tables</span>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-1 bg-white text-slate-900 text-base rounded border border-slate-300 shadow-sm font-bold">LHDN Guidelines</span>
+                        <span class="px-2 py-1 bg-white text-slate-900 text-base rounded border border-slate-300 shadow-sm font-bold">SDK Docs</span>
+                        <span class="px-2 py-1 bg-white text-slate-900 text-base rounded border border-slate-300 shadow-sm font-bold">Sample JSONs</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div id="user-journey" class="py-24 bg-white border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal-on-scroll is-visible">
+                <span class="text-purple-600 font-bold tracking-wide uppercase text-sm bg-purple-50 px-3 py-1 rounded-full border border-purple-100">Behind The Scenes</span>
+                <h2 class="text-4xl font-bold text-gray-900 mt-4 font-serif">A Day in the Life of a Hawker</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto text-lg">See how JamAI Base orchestrates the complexity while the user enjoys simplicity.</p>
+            </div>
+
+            <!-- Vertical Timeline Container -->
+            <div class="relative">
+                <!-- Center Line -->
+                <div class="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gray-100 hidden md:block"></div>
+
+                <!-- Step 1 -->
+                <div class="flex flex-col md:flex-row justify-between items-center mb-16 relative reveal-on-scroll is-visible">
+                    <!-- Left: User Action -->
+                    <div class="w-full md:w-5/12 text-right pr-0 md:pr-10 mb-6 md:mb-0">
+                        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-lg hover:border-brand-300 transition duration-300 relative group">
+                            <div class="absolute top-1/2 -right-3 w-6 h-6 bg-white border-r border-t border-gray-200 transform rotate-45 hidden md:block group-hover:border-brand-300"></div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-2"><i class="fa-solid fa-camera text-brand-500 mr-2"></i>Amir Snaps a Photo</h4>
+                            <p class="text-gray-600 text-sm">Amir finishes his busy lunch hour. He takes a photo of a raw supplier invoice with his phone.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Center Badge -->
+                    <div class="z-10 bg-brand-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-lg ring-4 ring-white mb-6 md:mb-0">1</div>
+                    
+                    <!-- Right: JamAI Orchestration -->
+                    <div class="w-full md:w-5/12 pl-0 md:pl-10">
+                        <div class="bg-gray-900 p-6 rounded-2xl shadow-lg relative overflow-hidden group">
+                             <div class="absolute top-1/2 -left-3 w-6 h-6 bg-gray-900 transform rotate-45 hidden md:block"></div>
+                             <div class="flex items-start gap-3">
+                                 <div class="mt-1"><i class="fa-solid fa-server text-purple-400"></i></div>
+                                 <div>
+                                     <h4 class="text-white font-bold text-sm uppercase tracking-wide mb-1">JamAI Event Trigger</h4>
+                                     <p class="text-gray-400 text-xs font-mono">
+                                         &gt; Ingests File URI<br>
+                                         &gt; Triggers `ActionTable: OCR_Extraction`<br>
+                                         &gt; Status: <span class="text-yellow-400">Processing...</span>
+                                     </p>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex flex-col md:flex-row justify-between items-center mb-16 relative reveal-on-scroll stagger-1 is-visible">
+                    <!-- Left: User Action -->
+                    <div class="w-full md:w-5/12 text-right pr-0 md:pr-10 mb-6 md:mb-0 order-1 md:order-1">
+                        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-lg hover:border-brand-300 transition duration-300 relative group">
+                            <div class="absolute top-1/2 -right-3 w-6 h-6 bg-white border-r border-t border-gray-200 transform rotate-45 hidden md:block group-hover:border-brand-300"></div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-2"><i class="fa-solid fa-spinner text-brand-500 mr-2 fa-spin-pulse"></i>Wait &lt; 30 Seconds</h4>
+                            <p class="text-gray-600 text-sm">Amir waits briefly while the 'Scanning' animation plays on his screen.</p>
+                        </div>
+                    </div>
+
+                    <!-- Center Badge -->
+                    <div class="z-10 bg-brand-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-lg ring-4 ring-white mb-6 md:mb-0 order-2 md:order-2">2</div>
+
+                    <!-- Right: JamAI Orchestration -->
+                    <div class="w-full md:w-5/12 pl-0 md:pl-10 order-3 md:order-3">
+                        <div class="bg-gray-900 p-6 rounded-2xl shadow-lg relative overflow-hidden">
+                             <div class="absolute top-1/2 -left-3 w-6 h-6 bg-gray-900 transform rotate-45 hidden md:block"></div>
+                             <div class="flex items-start gap-3">
+                                 <div class="mt-1"><i class="fa-solid fa-microchip text-blue-400"></i></div>
+                                 <div>
+                                     <h4 class="text-white font-bold text-sm uppercase tracking-wide mb-1">LLM Reasoning Node</h4>
+                                     <p class="text-gray-400 text-xs font-mono">
+                                         &gt; Extract: Date, Total, TIN<br>
+                                         &gt; Map: "Kopi" -&gt; `TaxCode: 06`<br>
+                                         &gt; Output: JSON Schema
+                                     </p>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex flex-col md:flex-row justify-between items-center mb-16 relative reveal-on-scroll stagger-2 is-visible">
+                    <!-- Left: User Action -->
+                    <div class="w-full md:w-5/12 text-right pr-0 md:pr-10 mb-6 md:mb-0">
+                        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-lg hover:border-brand-300 transition duration-300 relative group">
+                             <div class="absolute top-1/2 -right-3 w-6 h-6 bg-white border-r border-t border-gray-200 transform rotate-45 hidden md:block group-hover:border-brand-300"></div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-2"><i class="fa-solid fa-circle-check text-green-500 mr-2"></i>Review &amp; Confirm</h4>
+                            <p class="text-gray-600 text-sm">The form is auto-filled. Amir sees a green "Valid" badge and hits 'Submit'.</p>
+                        </div>
+                    </div>
+
+                    <!-- Center Badge -->
+                    <div class="z-10 bg-brand-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-lg ring-4 ring-white mb-6 md:mb-0">3</div>
+
+                    <!-- Right: JamAI Orchestration -->
+                    <div class="w-full md:w-5/12 pl-0 md:pl-10">
+                        <div class="bg-gray-900 p-6 rounded-2xl shadow-lg relative overflow-hidden">
+                             <div class="absolute top-1/2 -left-3 w-6 h-6 bg-gray-900 transform rotate-45 hidden md:block"></div>
+                             <div class="flex items-start gap-3">
+                                 <div class="mt-1"><i class="fa-solid fa-shield-halved text-green-400"></i></div>
+                                 <div>
+                                     <h4 class="text-white font-bold text-sm uppercase tracking-wide mb-1">Compliance Guardrail</h4>
+                                     <p class="text-gray-400 text-xs font-mono">
+                                         &gt; Cross-check LHDN API rules<br>
+                                         &gt; Validate Calc (Qty * Price)<br>
+                                         &gt; POST to LHDN API
+                                     </p>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW SECTION: Tech Stack (Added Here) -->
+    
+
+    <!-- NEW SECTION: Impact & Feasibility (Added Here) -->
+    <div id="impact" class="py-24 bg-gray-50 border-t border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header -->
+            <div class="text-center mb-16 reveal-on-scroll is-visible">
+                 <span class="text-green-600 font-bold tracking-wide uppercase text-sm bg-green-50 px-3 py-1 rounded-full border border-green-100">Real World Impact</span>
+                 <h2 class="text-4xl font-bold mt-4 font-serif text-gray-900">Impact &amp; Feasibility</h2>
+                 <p class="mt-4 text-gray-600 max-w-2xl mx-auto text-lg">Quantifiable benefits for the Malaysian economy and business owners.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1: Market Size -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 text-center reveal-on-scroll hover:-translate-y-2 transition duration-300 relative overflow-hidden group is-visible">
+                    <div class="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-10 transition duration-500"></div>
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-50 text-blue-600 text-3xl mb-6 group-hover:scale-110 transition duration-300">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <!-- Updated to 1.2M+ (2024 Projection) -->
+                    <div class="text-5xl font-black text-gray-900 mb-2 tracking-tight">1.2M+</div>
+                    <div class="text-sm font-bold text-blue-600 uppercase tracking-wider mb-6">Micro-SMEs (2024 Est.)</div>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        Targeting the massive <strong>97.4%</strong> of Malaysian businesses (MSMEs). Projected from the <a href="https://www.dosm.gov.my/portal-main/release-content/profile-of-micro-small-and-medium-enterprises-msmes-2022" target="_blank" class="text-blue-600 hover:underline font-bold">1.17M baseline (DOSM 2022)</a>.
+                    </p>
+                </div>
+
+                <!-- Card 2: Time Efficiency -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 text-center reveal-on-scroll stagger-1 hover:-translate-y-2 transition duration-300 relative overflow-hidden group is-visible">
+                    <div class="absolute inset-0 bg-green-50 opacity-0 group-hover:opacity-10 transition duration-500"></div>
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-50 text-green-600 text-3xl mb-6 group-hover:scale-110 transition duration-300">
+                        <i class="fa-solid fa-stopwatch"></i>
+                    </div>
+                    <div class="text-5xl font-black text-gray-900 mb-2 tracking-tight">96.67%</div>
+                    <div class="text-sm font-bold text-green-600 uppercase tracking-wider mb-6">Time Saved</div>
+                    <p class="text-gray-600 leading-relaxed">
+                        Drastically reduces invoice processing time from a manual average of <strong>15 minutes</strong> per receipt to under <strong>30 seconds</strong> with automation.
+                    </p>
+                </div>
+
+                <!-- Card 3: Accuracy -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 text-center reveal-on-scroll stagger-2 hover:-translate-y-2 transition duration-300 relative overflow-hidden group is-visible">
+                    <div class="absolute inset-0 bg-purple-50 opacity-0 group-hover:opacity-10 transition duration-500"></div>
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-purple-50 text-purple-600 text-3xl mb-6 group-hover:scale-110 transition duration-300">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <div class="text-5xl font-black text-gray-900 mb-2 tracking-tight">~0%</div>
+                    <div class="text-sm font-bold text-purple-600 uppercase tracking-wider mb-6">Compliance Errors</div>
+                    <p class="text-gray-600 leading-relaxed">
+                        JamAI's automated schema validation eliminates typos, wrong tax codes, and missing fields, ensuring a near-zero rejection rate from LHDN.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Section -->
+    
+
+    <!-- FAQ Section -->
+    <div class="py-24 bg-white">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-gray-900 text-center mb-12 reveal-on-scroll is-visible">Frequently Asked Questions</h2>
+            
+            <div class="space-y-4 reveal-on-scroll stagger-1 is-visible">
+                <!-- FAQ Item 1 -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group">
+                    <button class="w-full px-6 py-4 text-left font-semibold text-gray-900 flex justify-between items-center focus:outline-none" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180');">
+                        Does EzBill work for walk-in customers without TIN?
+                        <i class="fa-solid fa-chevron-down text-gray-400 text-sm transition-transform duration-300 rotate-180"></i>
+                    </button>
+                    <div class="px-6 pb-4 text-gray-600">
+                        Yes! The system automatically assigns the General TIN (EI00000000010) for walk-in customers, ensuring you can submit the invoice without errors.
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group">
+                    <button class="w-full px-6 py-4 text-left font-semibold text-gray-900 flex justify-between items-center focus:outline-none" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180');">
+                        Can I integrate EzBill with my existing POS?
+                        <i class="fa-solid fa-chevron-down text-gray-400 text-sm transition-transform duration-300 rotate-180"></i>
+                    </button>
+                    <div class="px-6 pb-4 text-gray-600">
+                        Absolutely. We provide an API endpoint or a browser extension that sits on top of the MyInvois portal to autofill data directly.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Infinite Marquee (Supported Platforms) -->
+    <div class="bg-gray-50 border-y border-gray-200 py-8 overflow-hidden relative">
+        <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-gray-50 to-transparent z-10"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-gray-50 to-transparent z-10"></div>
+        
+        <div class="flex items-center gap-16 animate-marquee whitespace-nowrap opacity-60 grayscale hover:grayscale-0 transition duration-500">
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-bag-shopping"></i> Shopee</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-utensils"></i> GrabFood</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-shop"></i> TikTok Shop</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-brands fa-shopify"></i> Shopify</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-store"></i> Kedai Runcit</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-cash-register"></i> POS Systems</span>
+            <!-- Duplicate for seamless loop -->
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-bag-shopping"></i> Shopee</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-utensils"></i> GrabFood</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-shop"></i> TikTok Shop</span>
+            <span class="text-xl font-bold flex items-center gap-2"><i class="fa-brands fa-shopify"></i> Shopify</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white pt-16 pb-8 border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Updated Grid to 4 columns since we removed 2 sections -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                
+                <!-- Brand Column (Spans 2 cols on large screens) -->
+                <div class="lg:col-span-2">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white font-bold">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </div>
+                        <span class="font-bold text-2xl tracking-tight text-gray-900">EzBill</span>
+                    </div>
+                    
+                    <!-- Social Icons -->
+                    <div class="flex gap-4 mb-8">
+                        <a href="#" class="text-gray-400 hover:text-black transition text-xl"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-black transition text-xl"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-black transition text-xl"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-black transition text-xl"><i class="fa-brands fa-facebook"></i></a>
+                    </div>
+
+                    <div class="text-gray-500 text-sm">
+                        <p class="mb-2 font-medium text-gray-900">Need help?</p>
+                        <a href="mailto:support@ezbill.com" class="text-gray-600 hover:text-black underline decoration-gray-300 hover:decoration-black transition">support@ezbill.com</a>
+                    </div>
+                </div>
+
+                <!-- Removed "EzBill" Link Group -->
+
+                <!-- Links Column 2 (Features) - Spans 2 cols on lg -->
+                <div class="lg:col-span-2">
+                    <h4 class="font-bold text-gray-900 mb-4">Features</h4>
+                    <!-- Changed grid for links to 2 columns within this block for better density if needed, or keep as list -->
+                    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-500">
+                        <li><a href="#" class="hover:text-brand-600 transition">Smart OCR Scanning</a></li>
+                        <li><a href="#" class="hover:text-brand-600 transition">RAG Validation Engine</a></li>
+                        <li><a href="#" class="hover:text-brand-600 transition">Auto Tax Coding</a></li>
+                        <li><a href="#" class="hover:text-brand-600 transition">MyInvois Integration</a></li>
+                        <li><a href="#" class="hover:text-brand-600 transition">Bulk Processing</a></li>
+                        <li>
+                            <a href="#" class="hover:text-brand-600 transition flex items-center gap-2">
+                                Mobile App <span class="bg-brand-100 text-brand-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Coming soon</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Removed "Tools" Link Group -->
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+                <div>
+                    © 2025 EzBill. All rights reserved.
+                </div>
+                <div class="flex flex-wrap justify-center gap-6">
+                    <a href="#" class="hover:text-gray-600 transition">Terms of Service</a>
+                    <a href="#" class="hover:text-gray-600 transition">Privacy Policy</a>
+                    <a href="#" class="hover:text-gray-600 transition">Cookies Policy</a>
+                    <a href="#" class="hover:text-gray-600 transition">About Us</a>
+                    <a href="#" class="hover:text-gray-600 transition">Ethics</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll Reveal Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Existing Reveal Animation
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            });
+
+            document.querySelectorAll('.reveal-on-scroll').forEach((el) => {
+                observer.observe(el);
+            });
+            
+            setTimeout(() => {
+                const heroElements = document.querySelectorAll('.pt-32 .reveal-on-scroll');
+                heroElements.forEach(el => el.classList.add('is-visible'));
+            }, 100);
+
+            // --- SEQUENTIAL CARD SCROLL LOGIC (3 CARDS - Updated) ---
+            const section = document.getElementById('parallax-section');
+            const cards = [
+                { el: document.getElementById('p-card-1'), color: 'rgba(250, 204, 21, 0.5)' }, // Brand Green
+                { el: document.getElementById('p-card-2'), color: 'rgba(239, 68, 68, 0.5)' },  // Red (Was Card 3)
+                { el: document.getElementById('p-card-3'), color: 'rgba(168, 85, 247, 0.5)' }  // Purple (Was Card 4)
+            ];
+
+            // Helper to map range
+            const mapRange = (value, inMin, inMax, outMin, outMax) => {
+                const clampedInput = Math.max(inMin, Math.min(inMax, value));
+                return ((clampedInput - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
+            };
+
+            window.addEventListener('scroll', () => {
+                if (!section) return;
+
+                const rect = section.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                const viewportWidth = window.innerWidth;
+                
+                const totalScrollableDistance = section.offsetHeight - viewportHeight;
+                const currentScroll = -rect.top;
+                
+                let progress = currentScroll / totalScrollableDistance;
+                progress = Math.max(0, Math.min(1, progress));
+
+                // UPDATED Animation Logic for 3 Cards
+                // Spanning 0.10 to 0.90 roughly
+                const cardWindows = [
+                    { start: 0.10, end: 0.40 },
+                    { start: 0.35, end: 0.65 },
+                    { start: 0.60, end: 0.90 }
+                ];
+
+                cards.forEach((card, index) => {
+                    const window = cardWindows[index];
+                    
+                    // Normalized progress for this specific card (0 to 1 within its window)
+                    // Added slight padding (+0.1) to window for smoother transitions
+                    const windowDuration = (window.end + 0.1) - (window.start - 0.1);
+                    const effectiveProgress = (progress - (window.start - 0.1)) / windowDuration;
+                    
+                    // Translate Logic:
+                    // Move from Right (100vw + buffer) to Left (-100vw - buffer)
+                    // Start/End points pushed further out to ensure no card is visible at start/end of section
+                    const startX = viewportWidth * 1.2 + 400;
+                    const endX = -viewportWidth * 1.2 - 400;
+
+                    let xPos;
+                    // 40% Enter, 20% Pause in Center, 40% Exit
+                    if (effectiveProgress < 0.4) {
+                        // Entering
+                        xPos = mapRange(effectiveProgress, 0, 0.4, startX, 0);
+                    } else if (effectiveProgress > 0.6) {
+                        // Exiting
+                        xPos = mapRange(effectiveProgress, 0.6, 1, 0, endX);
+                    } else {
+                        // Center Hover (Slow movement for readability)
+                        xPos = mapRange(effectiveProgress, 0.4, 0.6, 0, 0); 
+                    }
+
+                    // Rotation Logic
+                    const rotation = mapRange(effectiveProgress, 0, 1, 15, -15);
+
+                    // Opacity Logic
+                    let opacity = 0;
+                    if (effectiveProgress > 0.1 && effectiveProgress < 0.9) {
+                        opacity = 1;
+                    } else {
+                        // Fade edges quickly
+                        const distToCenter = Math.abs(effectiveProgress - 0.5);
+                        opacity = 1 - ((distToCenter - 0.4) * 10); 
+                    }
+                    opacity = Math.max(0, Math.min(1, opacity));
+
+                    // SCALE & GLOW EFFECT (The "Spotlight")
+                    // When card is near center (progress ~0.5 relative to its window), scale up
+                    const isCentered = effectiveProgress > 0.4 && effectiveProgress < 0.6;
+                    const scale = isCentered ? 1.1 : 0.9;
+                    const boxShadow = isCentered 
+                        ? `0 25px 50px -12px ${card.color}, 0 0 0 4px ${card.color}` // Glow ring
+                        : '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
+
+                    // Initial state handling: force far off-screen if progress is 0
+                    if (progress <= 0.01) {
+                         card.el.style.transform = `translate(${startX}px, 0px)`;
+                         card.el.style.opacity = 0;
+                    } else {
+                        // Apply Styles
+                        card.el.style.transform = `translate(${xPos}px, 0px) rotate(${rotation}deg) scale(${scale})`;
+                        card.el.style.opacity = opacity;
+                        card.el.style.boxShadow = boxShadow;
+                        card.el.style.zIndex = isCentered ? 100 : 10; // Bring active card to front
+                    }
+                });
+            });
+        });
+    </script>
+
+</body></html>
