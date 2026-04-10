@@ -1,4 +1,4 @@
-# EzBill - LHDN Compliance Unit
+# EzBill - AI-Powered MyInvois Compliance Assistant
 
 EzBill is an AI-powered tool designed to streamline e-invoicing compliance for Malaysian SMEs. It bridges the gap between physical receipts and the MyInvois standard using JamAI Base.
 
