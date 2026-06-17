@@ -375,9 +375,9 @@
         );
 
         const ConfigModal = ({ isOpen, onClose, config, onSave, lang }) => {
-            if (!isOpen) return null;
             const [temp, setTemp] = useState(config);
             const txt = t[lang];
+            if (!isOpen) return null;
 
             return (
                 <div className="fixed inset-0 bg-black/40 dark:bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm transition-opacity">
