@@ -409,13 +409,15 @@
             const messagesEndRef = useRef(null);
 
             useEffect(() => {
-                if (messages.length === 0) {
-                    setMessages([{ role: 'ai', text: txt.chatWelcome }]);
-                } else if (messages[0].role === 'ai') {
-                    const newMsgs = [...messages];
-                    newMsgs[0].text = txt.chatWelcome;
-                    setMessages(newMsgs);
-                }
+                setMessages(prev => {
+                    if (prev.length === 0) return [{ role: 'ai', text: txt.chatWelcome }];
+                    if (prev[0].role === 'ai') {
+                        const next = [...prev];
+                        next[0] = { ...next[0], text: txt.chatWelcome };
+                        return next;
+                    }
+                    return prev;
+                });
             }, [lang]);
 
             useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
